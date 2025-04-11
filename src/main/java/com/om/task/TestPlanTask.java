@@ -1,11 +1,7 @@
 package com.om.task;
 
-import com.om.mapper.EngineerMapper;
-import com.om.mapper.TestOrderMapper;
 import com.om.mapper.TestPlanMapper;
 import com.om.pojo.dto.TestOrderAddDTO;
-import com.om.pojo.entity.Engineer;
-import com.om.pojo.entity.TestOrder;
 import com.om.pojo.entity.TestPlan;
 import com.om.service.TestOrderService;
 import lombok.extern.slf4j.Slf4j;

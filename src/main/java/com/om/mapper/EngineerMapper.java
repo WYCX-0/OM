@@ -3,8 +3,6 @@ package com.om.mapper;
 import com.github.pagehelper.Page;
 import com.om.pojo.dto.EngineerPageDTO;
 import com.om.pojo.entity.Engineer;
-import lombok.ToString;
-import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

@@ -1,10 +1,7 @@
 package com.om.controller.admin;
 
-import com.om.pojo.dto.FailAddDTO;
-import com.om.pojo.dto.FailPageDTO;
 import com.om.pojo.dto.TestPlanAddDTO;
 import com.om.pojo.dto.TestPlanPageDTO;
-import com.om.pojo.entity.Fail;
 import com.om.pojo.entity.TestPlan;
 import com.om.pojo.result.PageResult;
 import com.om.pojo.result.Result;
