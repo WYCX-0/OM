@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.om.mapper.SpareMapper" >
+    <select id="list" resultType="com.om.pojo.entity.Spare">
+        select * from spare
+        <where>
+            <if test="engineerId!=null and engineerId!=0">
+                and engineer_id = #{engineerId}
+            </if>
+        </where>
+        order by id asc
+    </select>
+</mapper>

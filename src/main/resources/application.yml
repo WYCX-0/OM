@@ -1,0 +1,28 @@
+server:
+  port: 9090
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/om
+    username: root
+    password: Zcx082800
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.om.pojo.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+om:
+  jwt:
+    admin-secret-key: admin
+    engineer-secret-key: engineer
+    admin-ttl: 7200000
+    engineer-ttl: 7200000
+    admin-token-name: Authorization
+    engineer-token-name: Authorization

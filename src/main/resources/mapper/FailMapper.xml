@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.om.mapper.FailMapper" >
+    <update id="update" parameterType="com.om.pojo.entity.Fail">
+        update fail
+        <set>
+            <if test="dealTime!=null">
+                deal_time = #{dealTime},
+            </if>
+            <if test="deleteTime!=null">
+                delete_time = #{deleteTime},
+            </if>
+            <if test="finishTime!=null">
+                finish_time = #{finishTime},
+            </if>
+            <if test="finishUrl!=null">
+                finish_url = #{finishUrl},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="list" resultType="com.om.pojo.entity.Fail">
+        select * from fail
+        <where>
+            <if test="deviceId!=null and deviceId!=0">
+                and device_id = #{deviceId}
+            </if>
+            <if test="engineerId!=null and engineerId!=0">
+                and engineer_id = #{engineerId}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+</mapper>
