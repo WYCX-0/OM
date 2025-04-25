@@ -2,6 +2,7 @@ package com.om.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.om.context.BaseContext;
 import com.om.mapper.SpareMapper;
 import com.om.pojo.dto.SparePageDTO;
 import com.om.pojo.entity.Spare;
@@ -28,6 +29,7 @@ public class SpareServiceImpl implements SpareService {
     @Override
     public void add(Spare spare) {
         spare.setCreateTime(LocalDateTime.now());
+        spare.setEngineerId(BaseContext.getCurrentId());
         spareMapper.add(spare);
     }
 

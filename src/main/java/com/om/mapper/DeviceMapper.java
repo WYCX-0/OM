@@ -13,7 +13,7 @@ public interface DeviceMapper {
     /**
      * 添加设备
      * @param device
-     */@Insert("insert into device(name,address,type,fence_id,create_time,status) values(#{name},#{address},#{type},#{fenceId},#{createTime},#{status})")
+     */@Insert("insert into device(name,address,type,create_time,status,radius,center_lat,center_lng) values(#{name},#{address},#{type},#{createTime},#{status},#{radius},#{centerLat},#{centerLng})")
     void add(Device device);
 
 
@@ -43,4 +43,20 @@ public interface DeviceMapper {
      */
     @Select("select * from device where type=4")
     List<Device> get4();
+
+    /**
+     * 根据设备名称查询设备
+     * @param name
+     * @return
+     */
+    @Select("select * from device where name=#{name}")
+    Device getByName(String name);
+
+    /**
+     * 根据设备id查询设备
+     * @param id
+     * @return
+     */
+    @Select("select * from device where id=#{id}")
+    Device get4ById(Integer id);
 }

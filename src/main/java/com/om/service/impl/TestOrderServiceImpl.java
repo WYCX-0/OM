@@ -48,8 +48,7 @@ public class TestOrderServiceImpl implements TestOrderService {
 
         String message=testOrder.getId()+","+engineer.getId();
         String role="admin";
-        long sid=BaseContext.getCurrentId();
-        String sid1=String.valueOf(sid);
+        String sid1="1";
         webSocketServer.onMessage(message,role,sid1);
     }
 

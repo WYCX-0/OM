@@ -2,7 +2,6 @@ package com.om.controller.admin;
 
 import com.om.pojo.dto.DevicePageDTO;
 import com.om.pojo.entity.Device;
-import com.om.pojo.entity.Fence;
 import com.om.pojo.result.PageResult;
 import com.om.pojo.result.Result;
 import com.om.service.DeviceService;
@@ -30,6 +29,10 @@ public class DeviceController {
     @PostMapping("/add")
     public Result<String> add(@RequestBody Device device){
         log.info("添加设备: {}", device);
+        Device device1=deviceService.getByName(device.getName());
+        if(device1!=null){
+            return Result.error("设备名已存在");
+        }
         deviceService.add(device);
         return Result.success();
     }
@@ -95,5 +98,18 @@ public class DeviceController {
         List<Device> devices = deviceService.get4();
         return Result.success(devices);
     }
+
+    /**
+     *查询设备电子围栏
+     * @param id
+     * @return
+     */
+    @GetMapping("/get4/{id}")
+    public Result<Device> get4ById(@PathVariable Integer id){
+        log.info("查询设备电子围栏：{}",id);
+        Device device = deviceService.get4ById(id);
+        return Result.success(device);
+    }
+
 
 }

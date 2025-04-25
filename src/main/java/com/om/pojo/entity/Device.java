@@ -15,8 +15,10 @@ public class Device {
     private  String name;
     private  String address;
     private  Integer type;
-    private  long fenceId;
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime deleteTime;
+    private Integer radius;
+    private String centerLat;
+    private String centerLng;
 }

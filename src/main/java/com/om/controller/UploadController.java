@@ -33,7 +33,7 @@ public class UploadController {
         Path filePath = Paths.get(UPLOAD_URL).resolve(uniqueFilename);
         Files.copy(file.getInputStream(), filePath);
 
-        String fileUrl = "http://192.168.72.195:9090/" + uniqueFilename;
+        String fileUrl = "http://192.168.47.195:9090/" + uniqueFilename;
         return Result.success(fileUrl);
     }
 }

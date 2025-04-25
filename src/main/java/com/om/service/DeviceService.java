@@ -39,4 +39,18 @@ public interface DeviceService {
      * @return
      */
     List<Device> get4();
+
+    /**
+     * 根据设备名称查询设备
+     * @param name
+     * @return
+     */
+    Device getByName(String name);
+
+    /**
+     * 根据id查询消防设备
+     * @param id
+     * @return
+     */
+    Device get4ById(Integer id);
 }

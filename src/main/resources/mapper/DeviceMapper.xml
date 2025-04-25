@@ -30,6 +30,15 @@
             <if test="status!=null">
                 status = #{status},
             </if>
+            <if test="radius!=null">
+                radius = #{radius},
+            </if>
+            <if test="centerLat!=null">
+                center_lat = #{centerLat},
+            </if>
+            <if test="centerLng!=null">
+                center_lng = #{centerLng},
+            </if>
         </set>
         where id = #{id}
     </update>

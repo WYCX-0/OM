@@ -73,4 +73,24 @@ public class DeviceServiceImpl implements DeviceService {
     public List<Device> get4() {
         return deviceMapper.get4();
     }
+
+    /**
+     * 根据设备名称查询设备
+     * @param name
+     * @return
+     */
+    @Override
+    public Device getByName(String name) {
+        return deviceMapper.getByName(name);
+    }
+
+    /**
+     * 根据id查询消防设备
+     * @param id
+     * @return
+     */
+    @Override
+    public Device get4ById(Integer id) {
+        return deviceMapper.get4ById(id);
+    }
 }
