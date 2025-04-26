@@ -1,22 +1,34 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path:'/',
+    redirect: '/login'
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/login',
+    name: 'Login',
+    component:()=>import('../views/LoginView.vue')
+  },
+  {
+    path: '/index',
+    name: 'Index',
+    component:()=>import('../views/IndexView.vue'),
+    redirect:'/index/home',
+    children:[
+      {path:'home',name:'Home',component:()=>import('../views/index/HomeView.vue')},
+      {path:'engineer',name:'Engineer',component:()=>import('../views/index/EngineerView.vue')},
+      {path:'device',name:'Device',component:()=>import('../views/index/DeviceView.vue')},
+      {path:'fail',name:'Fail',component:()=>import('../views/index/FailView.vue')},
+      {path:'test-plan',name:'Test-Plan',component:()=>import('../views/index/TestPlanView.vue')},
+      {path:'test-order',name:'Test-Order',component:()=>import('../views/index/TestOrderView.vue')},
+      {path:'spare',name:'Spare',component:()=>import('../views/index/SpareView.vue')},
+      { path: 'device-form/:dialogType', name: 'DeviceForm', component: () => import('../views/index/DeviceForm.vue'), props: true }
+   
+    ]
   }
 ]
 

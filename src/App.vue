@@ -1,32 +1,31 @@
 <template>
   <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
     <router-view/>
+    <GlobalDialog ref="globalDialog" />
   </div>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import GlobalDialog from './components/GlobalDialog.vue';
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+export default {
+  name: 'App',
+  components: {
+    GlobalDialog
+  },
+  mounted() {
+    // 监听全局WebSocket消息事件
+    window.addEventListener('websocket-message', this.handleWebSocketMessage);
+  },
+  beforeDestroy() {
+    window.removeEventListener('websocket-message', this.handleWebSocketMessage);
+  },
+  methods: {
+    handleWebSocketMessage(event) {
+      const message = event.detail;
+      this.$refs.globalDialog.showDialog(`收到消息: ${message}`);
+    }
+  }
+};
+</script>
+    
