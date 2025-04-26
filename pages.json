@@ -1,0 +1,41 @@
+{
+	"pages": [{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "主页"
+			}
+		},
+		{
+			"path": "pages/fail/fail",
+			"style": {
+				"navigationBarTitleText": "故障详情"
+			}
+		},
+		{
+			"path": "pages/testOrder/testOrder",
+			"style": {
+				"navigationBarTitleText": ""
+			}
+		},
+		{
+			"path" : "pages/spare/spare",
+			"style" : 
+			{
+				"navigationBarTitleText" : ""
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {}
+}

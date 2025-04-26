@@ -1,0 +1,89 @@
+
+.item-content[data-v-1cf27b2a] {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+}
+.device-info[data-v-1cf27b2a] {
+		display: flex;
+		flex-direction: column;
+}
+.device-id[data-v-1cf27b2a] {
+		font-size: 0.875rem;
+		font-weight: bold;
+		color: #333;
+}
+.detail[data-v-1cf27b2a] {
+		font-size: 0.75rem;
+		color: #666;
+}
+.status[data-v-1cf27b2a] {
+		font-size: 0.75rem;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.625rem;
+}
+.status-cancel[data-v-1cf27b2a] {
+		color: #999;
+		border: 0.03125rem solid #999;
+}
+.status-pending[data-v-1cf27b2a] {
+		color: #FF4D4F;
+		border: 0.03125rem solid #FF4D4F;
+		font-weight: bold;
+}
+.status-processing[data-v-1cf27b2a] {
+		color: #007AFF;
+		border: 0.03125rem solid #007AFF;
+}
+.status-complete[data-v-1cf27b2a] {
+		color: #4CD964;
+		border: 0.03125rem solid #4CD964;
+		font-weight: bold;
+}
+.container[data-v-1cf27b2a] {
+		padding: 0.625rem;
+}
+.search-bar[data-v-1cf27b2a] {
+		margin-bottom: 0.9375rem;
+}
+.modules[data-v-1cf27b2a] {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 0.9375rem;
+}
+.module-item[data-v-1cf27b2a] {
+		flex: 1;
+		text-align: center;
+		padding: 0.625rem;
+		margin: 0 0.3125rem;
+		background-color: #f5f5f5;
+		border-radius: 0.3125rem;
+		transition: all 0.3s;
+}
+.module-item.active[data-v-1cf27b2a] {
+		background-color: #007AFF;
+		color: white;
+}
+.list-container[data-v-1cf27b2a] {
+		height: calc(100vh - 9.375rem);
+}
+.list-item[data-v-1cf27b2a] {
+		padding: 0.9375rem;
+		background: white;
+		margin-bottom: 0.625rem;
+		border-radius: 0.3125rem;
+		display: flex;
+		justify-content: space-between;
+		box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1);
+		cursor: pointer;
+}
+.time[data-v-1cf27b2a] {
+		color: #888;
+		font-size: 0.75rem;
+}
+.empty[data-v-1cf27b2a] {
+		text-align: center;
+		color: #999;
+		padding: 1.5625rem;
+}

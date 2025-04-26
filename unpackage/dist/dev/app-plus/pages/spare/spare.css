@@ -1,0 +1,38 @@
+
+.container[data-v-bd81fea5] {
+		padding: 0.625rem;
+		background-color: #f5f7fa;
+		min-height: 100vh;
+}
+.form-card[data-v-bd81fea5] {
+		background-color: white;
+		border-radius: 0.5rem;
+		padding: 0.9375rem;
+		margin: 0.625rem;
+}
+.form-item[data-v-bd81fea5] {
+		margin-bottom: 0.9375rem;
+}
+.form-label[data-v-bd81fea5] {
+		font-size: 0.875rem;
+		color: #333;
+		display: block;
+		margin-bottom: 0.3125rem;
+}
+.form-textarea[data-v-bd81fea5] {
+		width: 100%;
+		min-height: 6.25rem;
+		padding: 0.625rem;
+		border: 0.03125rem solid #ddd;
+		border-radius: 0.25rem;
+		font-size: 0.875rem;
+}
+.submit-button[data-v-bd81fea5] {
+		background: #1890ff;
+		color: white;
+		border-radius: 0.25rem;
+		margin-top: 1.25rem;
+}
+.button-hover[data-v-bd81fea5] {
+		opacity: 0.8;
+}
