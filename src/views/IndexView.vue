@@ -72,6 +72,44 @@
               </el-menu-item>
             </el-submenu>
 
+
+            <!-- 巡检管理 -->
+          <el-submenu index="5">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span v-if="!isCollapse">巡检管理</span>
+            </template>
+            <el-menu-item index="/index/inspection-plan">
+              <i class="el-icon-s-custom"></i>
+              <span>巡检计划</span>
+            </el-menu-item>
+            <el-menu-item index="/index/inspection-order">
+              <i class="el-icon-s-custom"></i>
+              <span>巡检工单</span>
+            </el-menu-item>
+          </el-submenu>
+
+
+            <!-- 保养计划 -->
+            <el-submenu index="6">
+              <template slot="title">
+                <i class="el-icon-setting"></i>
+                <span v-if="!isCollapse">保养管理</span>
+              </template>
+              <el-menu-item index="/index/maintenance-plan">
+                <i class="el-icon-s-custom"></i>
+                <span>保养计划</span>
+              </el-menu-item>
+              <el-menu-item index="/index/maintenance-order">
+                <i class="el-icon-s-custom"></i>
+                <span>保养工单</span>
+              </el-menu-item>
+            </el-submenu>
+
+
+
+
+
           </el-menu>
         </el-aside>
 

@@ -24,11 +24,11 @@
                     <el-option label="只显示已完成工单" :value="3"></el-option>
                 </el-select>
             </div>
-            <div class="operation">
+            <!-- <div class="operation">
                 <el-button type="primary" icon="el-icon-plus" @click="handleAdd">
                     添加工单
                 </el-button>
-            </div>
+            </div> -->
         </div>
 
         <!-- 工单列表 -->
@@ -37,7 +37,7 @@
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
                 <el-table-column label="报修前图片" width="120">
                     <template slot-scope="scope">
-                        <img :src="scope.row.beforeUrl" alt="报修前图片" style="width: 100px; height: 80px; object-fit: cover;">
+                        <img :src="'http://localhost:9090' + scope.row.beforeUrl" alt="报修前图片" style="width: 100px; height: 80px; object-fit: cover;">
                     </template>
                 </el-table-column>
                 <el-table-column prop="detail" label="报修细节" width="110"></el-table-column>
@@ -96,7 +96,7 @@
                     <div>
                         <el-upload class="avatar-uploader" action="http://localhost:9090/upload"
                             :show-file-list="false" :on-success="handleAvatarSuccess" :on-error="handleUploadError">
-                            <img v-if="form.beforeUrl" :src="form.beforeUrl" class="avatar">
+                            <img v-if="form.beforeUrl" :src="'http://localhost:9090' + form.beforeUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
