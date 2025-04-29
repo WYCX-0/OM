@@ -42,7 +42,7 @@
 			</view>
 			<view class="detail-content">
 				<view class="image-container">
-					<image :src="detailData.beforeUrl || defaultImageUrl" mode="widthFix" class="detail-image"></image>
+					<image :src="processedBeforeUrl" mode="widthFix" class="detail-image"></image>
 					<view v-if="!detailData.beforeUrl" class="placeholder-image">
 						<text class="placeholder-text">暂无图片</text>
 					</view>
@@ -84,6 +84,11 @@
 </template>
 
 <script>
+	import {
+		baseConfig
+	} from '../../utils/config';
+
+
 	export default {
 		data() {
 			return {
@@ -97,7 +102,6 @@
 				},
 				repairImageUrl: '',
 				finishUrl: '',
-				defaultImageUrl: 'https://via.placeholder.com/300x200?text=No+Image',
 				deviceName: '',
 				deviceOptions: [],
 				token: '' // 请确保在实际使用中正确获取和存储 token
@@ -107,9 +111,10 @@
 			// 从URL参数中获取数据
 			if (options.detailData) {
 				try {
+					this.getAccessToken();
 					this.detailData = JSON.parse(decodeURIComponent(options.detailData));
 					this.getDeviceOptions(); // 获取设备选项
-					this.getAccessToken();
+
 				} catch (e) {
 					console.error('解析详情数据失败', e);
 					uni.showToast({
@@ -117,6 +122,14 @@
 						icon: 'none'
 					});
 				}
+			}
+		},
+		computed: {
+			processedBeforeUrl() {
+				if (this.detailData.beforeUrl) {
+					return `${baseConfig.baseUrl}${this.detailData.beforeUrl}`;
+				}
+				return this.defaultImageUrl;
 			}
 		},
 		methods: {
@@ -155,7 +168,7 @@
 						if (res.confirm) {
 							// 向后端发送请求
 							uni.request({
-								url: `http://192.168.47.195:9090/engineer/fail/deal/${this.detailData.id}`, // 替换为实际的后端 API 地址
+								url: `${baseConfig.baseUrl}/engineer/fail/deal/${this.detailData.id}`, // 替换为实际的后端 API 地址
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}` // ✅ 使用存储的 token
@@ -196,7 +209,7 @@
 
 						// 执行上传
 						uni.uploadFile({
-							url: 'http://192.168.47.195:9090/upload',
+							url: `${baseConfig.baseUrl}/upload`,
 							filePath: res.tempFilePaths[0], // 注意这里用 filePath 不是 src
 							name: 'file', // 必须与后端接收参数名一致
 							header: {
@@ -249,7 +262,7 @@
 					success: (res) => {
 						if (res.confirm) {
 							uni.request({
-								url: `http://192.168.47.195:9090/engineer/fail/finish/${this.detailData.id}`,
+								url: `${baseConfig.baseUrl}/engineer/fail/finish/${this.detailData.id}`,
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}`,
@@ -286,7 +299,7 @@
 			},
 			getDeviceOptions() {
 				uni.request({
-					url: 'http://192.168.47.195:9090/admin/device/get',
+					url: `${baseConfig.baseUrl}/engineer/device/get`,
 					method: 'GET',
 					header: {
 						'Authorization': `Bearer ${this.token}` // 确保正确使用存储的 token

@@ -20,14 +20,25 @@
 		{
 			"path": "pages/testOrder/testOrder",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "检测工单"
 			}
 		},
 		{
-			"path" : "pages/spare/spare",
-			"style" : 
-			{
-				"navigationBarTitleText" : ""
+			"path": "pages/spare/spare",
+			"style": {
+				"navigationBarTitleText": "备件申请"
+			}
+		},
+		{
+			"path": "pages/rtestOrder/rtestOrder",
+			"style": {
+				"navigationBarTitleText": "巡检工单"
+			}
+		},
+		{
+			"path": "pages/baoyangOrder/baoyangOrder",
+			"style": {
+				"navigationBarTitleText": "保养工单"
 			}
 		}
 	],

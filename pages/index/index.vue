@@ -25,39 +25,44 @@
 </template>
 
 <script>
+	import {
+		baseConfig
+	} from '../../utils/config';
+
+
 	export default {
 		data() {
 			return {
 				modules: [{
 						name: '维修',
 						type: 'repair',
-						url: 'http://192.168.47.195:9090/engineer/fail/getFail', // 维修模块接口
+						url: `${baseConfig.baseUrl}/engineer/fail/getFail`, // 维修模块接口
 						method: 'GET', // 请求方式
-						detailUrl: 'http://192.168.47.195:9090/engineer/fail/getById', // 维修详情接口
+						detailUrl: `${baseConfig.baseUrl}/engineer/fail/getById`, // 维修详情接口
 						detailPage: '/pages/fail/fail' // 维修详情页面路径
 					},
 					{
 						name: '巡检',
 						type: 'inspection',
-						url: '/',
-						method: 'POST',
-						detailUrl: '/api/inspection/getById', // 巡检详情接口
-						detailPage: '/pages/inspectionDetail' // 巡检详情页面路径
+						url: `${baseConfig.baseUrl}/engineer/rtestOrder/getRTestOrder`,
+						method: 'GET',
+						detailUrl: `${baseConfig.baseUrl}/engineer/rtestOrder/getById`,
+						detailPage: '/pages/rtestOrder/rtestOrder' // 巡检详情页面路径
 					},
 					{
 						name: '保养',
 						type: 'maintenance',
-						url: '/api/maintenance/list',
+						url: `${baseConfig.baseUrl}/engineer/baoyangOrder/getBaoyangOrder`,
 						method: 'GET',
-						detailUrl: '/api/maintenance/getById', // 保养详情接口
-						detailPage: '/pages/maintenanceDetail' // 保养详情页面路径
+						detailUrl: `${baseConfig.baseUrl}/engineer/baoyangOrder/getById`,
+						detailPage: '/pages/baoyangOrder/baoyangOrder' // 保养详情页面路径
 					},
 					{
 						name: '检测',
 						type: 'test',
-						url: 'http://192.168.47.195:9090/engineer/testOrder/getTestOrder',
+						url: `${baseConfig.baseUrl}/engineer/testOrder/getTestOrder`,
 						method: 'GET',
-						detailUrl: 'http://192.168.47.195:9090/engineer/testOrder/getById', // 检测详情接口
+						detailUrl: `${baseConfig.baseUrl}/engineer/testOrder/getById`, // 检测详情接口
 						detailPage: '/pages/testOrder/testOrder' // 检测详情页面路径
 					}
 				],
@@ -85,7 +90,7 @@
 			},
 			getDeviceOptions() {
 				uni.request({
-					url: 'http://192.168.47.195:9090/admin/device/get',
+					url: `${baseConfig.baseUrl}/engineer/device/get`,
 					method: 'GET',
 					header: {
 						'Authorization': `Bearer ${this.token}` // ✅ 使用存储的 token

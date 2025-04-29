@@ -27,7 +27,7 @@
 			<!-- 上传图片 (仅当状态为处理中时显示) -->
 			<view v-if="detailData.status === 2 && countdown === 0" class="detail-card">
 				<view class="detail-header">
-					<text class="detail-label">上传维修图片:</text>
+					<text class="detail-label">上传巡检图片</text>
 				</view>
 				<view class="detail-content">
 					<view class="upload-container">
@@ -188,7 +188,7 @@
 
 						const requestResult = await new Promise((resolve, reject) => {
 							uni.request({
-								url: `${baseConfig.baseUrl}/engineer/testOrder/deal/${this.detailData.id}`,
+								url: `${baseConfig.baseUrl}/engineer/rtestOrder/deal/${this.detailData.id}`,
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}`
@@ -540,7 +540,7 @@
 						console.log(this.current);
 						if (res.confirm) {
 							uni.request({
-								url: `${baseConfig.baseUrl}/engineer/testOrder/finish/${this.detailData.id}`,
+								url: `${baseConfig.baseUrl}/engineer/rtestOrder/finish/${this.detailData.id}`,
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}`,

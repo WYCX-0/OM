@@ -21,6 +21,11 @@
 	import {
 		websocketObj
 	} from '../../utils/websocket';
+	import {
+		baseConfig
+	} from '../../utils/config';
+
+
 	export default {
 		data() {
 			return {
@@ -39,7 +44,7 @@
 				}
 
 				uni.request({
-					url: 'http://192.168.245.195:9090/engineer/login',
+					url: `${baseConfig.baseUrl}/engineer/login`,
 					method: 'POST',
 					data: {
 						engineerNo: this.engineerNo,
@@ -52,8 +57,8 @@
 								name: res.data.data.name
 							});
 							uni.setStorageSync('token', res.data.data.token);
-
-							const wsURL = `ws://192.168.245.195:9090/ws/engineer/${res.data.data.id}`;
+							console.log(res.data.data.token);
+							const wsURL = `${baseConfig.wsBaseUrl}/ws/engineer/${res.data.data.id}`;
 							websocketObj.connect(wsURL, res.data.data.token);
 
 							uni.showToast({

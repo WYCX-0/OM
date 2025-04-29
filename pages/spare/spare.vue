@@ -13,6 +13,11 @@
 </template>
 
 <script>
+	import {
+		baseConfig
+	} from '../../utils/config';
+
+
 	export default {
 		data() {
 			return {
@@ -37,7 +42,7 @@
 
 				const token = uni.getStorageSync('token');
 				const res = await uni.request({
-					url: 'http://192.168.47.195:9090/engineer/spare/add',
+					url: `${baseConfig.baseUrl}/engineer/spare/add`,
 					method: 'POST',
 					header: {
 						'Authorization': `Bearer ${token}`,

@@ -188,7 +188,7 @@
 
 						const requestResult = await new Promise((resolve, reject) => {
 							uni.request({
-								url: `${baseConfig.baseUrl}/engineer/testOrder/deal/${this.detailData.id}`,
+								url: `${baseConfig.baseUrl}/engineer/baoyangOrder/deal/${this.detailData.id}`,
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}`
@@ -540,7 +540,7 @@
 						console.log(this.current);
 						if (res.confirm) {
 							uni.request({
-								url: `${baseConfig.baseUrl}/engineer/testOrder/finish/${this.detailData.id}`,
+								url: `${baseConfig.baseUrl}/engineer/baoyangOrder/finish/${this.detailData.id}`,
 								method: 'POST',
 								header: {
 									'Authorization': `Bearer ${this.token}`,
