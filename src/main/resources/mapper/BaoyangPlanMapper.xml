@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.om.mapper.BaoyangPlanMapper" >
+    <select id="list" resultType="com.om.pojo.entity.BaoyangPlan">
+        select * from baoyang_plan
+        <where>
+            <if test="deviceId!=null and deviceId!=0">
+                and device_id = #{deviceId}
+            </if>
+            <if test="status!=null">
+                and status = #{status}
+            </if>
+        </where>
+        order by id asc
+    </select>
+
+    <update id="update" parameterType="com.om.pojo.entity.BaoyangPlan">
+        update baoyang_plan
+        <set>
+            <if test="frequency!=null">
+                frequency = #{frequency},
+            </if>
+            <if test="time!=null">
+                time = #{time},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
+            <if test="nextTime!=null">
+                next_time = #{nextTime},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="findPlansToNext" resultType="com.om.pojo.entity.BaoyangPlan">
+        select * from baoyang_plan
+        where  status=1
+          and next_time &lt; #{now}
+    </select>
+
+</mapper>
