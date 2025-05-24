@@ -1,0 +1,1 @@
+{"version":3,"file":"config.js","sources":["utils/config.js"],"sourcesContent":["export const baseConfig = {\r\n\tbaseUrl: 'http://192.168.84.195:9090',\r\n\twsBaseUrl: 'ws://192.168.84.195:9090'\r\n}"],"names":[],"mappings":";AAAY,MAAC,aAAa;AAAA,EACzB,SAAS;AAAA,EACT,WAAW;AACZ;;"}

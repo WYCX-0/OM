@@ -127,8 +127,8 @@ if (uni.restoreGlobal) {
     }, 5e3);
   }
   const baseConfig = {
-    baseUrl: "http://192.168.163.195:9090",
-    wsBaseUrl: "ws://192.168.163.195:9090"
+    baseUrl: "http://192.168.225.195:9090",
+    wsBaseUrl: "ws://192.168.225.195:9090"
   };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
@@ -137,7 +137,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$7 = {
+  const _sfc_main$8 = {
     data() {
       return {
         engineerNo: "",
@@ -195,7 +195,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "brand-container" }, [
         vue.createElementVNode("text", { class: "brand-text" }, "运"),
@@ -241,8 +241,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-e4e4508d"], ["__file", "D:/app/om-engineer/pages/login/login.vue"]]);
-  const _sfc_main$6 = {
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-e4e4508d"], ["__file", "D:/app/om-engineer/pages/login/login.vue"]]);
+  const _sfc_main$7 = {
     data() {
       return {
         modules: [
@@ -250,13 +250,9 @@ if (uni.restoreGlobal) {
             name: "维修",
             type: "repair",
             url: `${baseConfig.baseUrl}/engineer/fail/getFail`,
-            // 维修模块接口
             method: "GET",
-            // 请求方式
             detailUrl: `${baseConfig.baseUrl}/engineer/fail/getById`,
-            // 维修详情接口
             detailPage: "/pages/fail/fail"
-            // 维修详情页面路径
           },
           {
             name: "巡检",
@@ -265,7 +261,6 @@ if (uni.restoreGlobal) {
             method: "GET",
             detailUrl: `${baseConfig.baseUrl}/engineer/rtestOrder/getById`,
             detailPage: "/pages/rtestOrder/rtestOrder"
-            // 巡检详情页面路径
           },
           {
             name: "保养",
@@ -274,7 +269,6 @@ if (uni.restoreGlobal) {
             method: "GET",
             detailUrl: `${baseConfig.baseUrl}/engineer/baoyangOrder/getById`,
             detailPage: "/pages/baoyangOrder/baoyangOrder"
-            // 保养详情页面路径
           },
           {
             name: "检测",
@@ -282,29 +276,92 @@ if (uni.restoreGlobal) {
             url: `${baseConfig.baseUrl}/engineer/testOrder/getTestOrder`,
             method: "GET",
             detailUrl: `${baseConfig.baseUrl}/engineer/testOrder/getById`,
-            // 检测详情接口
             detailPage: "/pages/testOrder/testOrder"
-            // 检测详情页面路径
           }
         ],
+        pendingOrder: false,
+        pendingOrderType: null,
+        pendingOrderId: null,
         activeModule: "repair",
         listData: [],
-        // 存储列表数据
         token: "",
-        deviceOptions: []
+        deviceOptions: [],
+        searchKeyword: ""
       };
     },
     mounted() {
       this.getAccessToken();
+      this.checkPendingOrder();
       this.fetchData();
       this.getDeviceOptions();
     },
     onPullDownRefresh() {
-      this.fetchData().then(() => {
+      Promise.all([this.fetchData(), this.checkPendingOrder()]).finally(() => {
         uni.stopPullDownRefresh();
       });
     },
     methods: {
+      getOrderTypeName(type) {
+        const typeMap = {
+          "repair": "维修",
+          "inspection": "巡检",
+          "maintenance": "保养",
+          "test": "检测"
+        };
+        return typeMap[type] || "未知";
+      },
+      async checkPendingOrder() {
+        try {
+          const {
+            data
+          } = await uni.request({
+            url: `${baseConfig.baseUrl}/engineer/fail/test`,
+            method: "POST",
+            header: {
+              "Authorization": `Bearer ${this.token}`
+            }
+          });
+          if (data.code === 200 && data.data) {
+            this.pendingOrder = true;
+            this.pendingOrderType = data.data.type;
+            this.pendingOrderId = data.data.id;
+          } else {
+            this.pendingOrder = false;
+            this.pendingOrderType = null;
+            this.pendingOrderId = null;
+          }
+        } catch (error) {
+          formatAppLog("error", "at pages/index/index.vue:128", "工单检查失败:", error);
+          this.pendingOrder = false;
+        }
+      },
+      async handlePendingOrderClick() {
+        if (!this.pendingOrderType || !this.pendingOrderId)
+          return;
+        const currentModule = this.modules.find((item) => item.type === this.pendingOrderType);
+        if (currentModule) {
+          const detailUrl = `${currentModule.detailUrl}/${this.pendingOrderId}`;
+          const res = await uni.request({
+            url: detailUrl,
+            method: "GET",
+            header: {
+              "Authorization": `Bearer ${this.token}`
+            }
+          });
+          if (res.data.code === 200) {
+            const detailData = res.data.data;
+            const encodedData = encodeURIComponent(JSON.stringify(detailData));
+            uni.navigateTo({
+              url: `${currentModule.detailPage}?detailData=${encodedData}`
+            });
+          } else {
+            uni.showToast({
+              title: "详情数据加载失败",
+              icon: "none"
+            });
+          }
+        }
+      },
       getAccessToken() {
         this.token = uni.getStorageSync("token");
       },
@@ -314,7 +371,6 @@ if (uni.restoreGlobal) {
           method: "GET",
           header: {
             "Authorization": `Bearer ${this.token}`
-            // ✅ 使用存储的 token
           },
           success: (res) => {
             if (res.data.code === 200) {
@@ -322,16 +378,16 @@ if (uni.restoreGlobal) {
                 id: device.id,
                 name: device.name
               }));
-              this.updateListDataDeviceNames();
+              if (this.listData.length > 0) {
+                this.updateListDataDeviceNames();
+              }
             }
           }
         });
       },
-      // 获取当前模块配置
       getCurrentModule() {
         return this.modules.find((item) => item.type === this.activeModule);
       },
-      // 获取数据（修改后）
       async fetchData() {
         try {
           const currentModule = this.getCurrentModule();
@@ -340,26 +396,18 @@ if (uni.restoreGlobal) {
           const requestConfig = {
             url: currentModule.url,
             method: currentModule.method,
-            data: {}
+            header: {
+              "Authorization": `Bearer ${this.token}`
+            }
           };
           if (currentModule.method === "GET") {
             requestConfig.data = {
-              moduleType: this.activeModule,
               keyword: this.searchKeyword
             };
-            requestConfig.header = {
-              "Authorization": `Bearer ${this.token}`
-            };
           } else {
-            requestConfig.header = {
-              "Authorization": `Bearer ${this.token}`
-            };
             requestConfig.data = {
-              queryParams: {
-                keyword: this.searchKeyword
-              }
+              keyword: this.searchKeyword
             };
-            requestConfig.data = JSON.stringify(requestConfig.data);
           }
           const res = await uni.request(requestConfig);
           if (res.statusCode === 200) {
@@ -377,7 +425,6 @@ if (uni.restoreGlobal) {
         this.activeModule = type;
         this.fetchData();
       },
-      // 状态处理方法
       getStatusClass(status) {
         switch (status) {
           case 0:
@@ -407,8 +454,10 @@ if (uni.restoreGlobal) {
         }
       },
       getDeviceName(deviceId) {
-        const device = this.deviceOptions.find((item) => item.id === deviceId);
-        return device ? device.name : "未知设备";
+        var _a;
+        if (!deviceId)
+          return "未绑定设备";
+        return ((_a = this.deviceOptions.find((item) => item.id === deviceId)) == null ? void 0 : _a.name) || "未知设备";
       },
       updateListDataDeviceNames() {
         this.listData = this.listData.map((item) => {
@@ -445,7 +494,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createCommentVNode(" 功能模块 "),
       vue.createElementVNode("view", { class: "modules" }, [
@@ -463,6 +512,23 @@ if (uni.restoreGlobal) {
           /* KEYED_FRAGMENT */
         ))
       ]),
+      $data.pendingOrder ? (vue.openBlock(), vue.createElementBlock("view", {
+        key: 0,
+        class: "pending-notice",
+        onClick: _cache[0] || (_cache[0] = (...args) => $options.handlePendingOrderClick && $options.handlePendingOrderClick(...args))
+      }, [
+        vue.createElementVNode("text", null, [
+          vue.createTextVNode("您有正在处理中的"),
+          vue.createElementVNode(
+            "text",
+            { class: "order-type" },
+            vue.toDisplayString($options.getOrderTypeName($data.pendingOrderType)),
+            1
+            /* TEXT */
+          ),
+          vue.createTextVNode("工单，点击查看详情")
+        ])
+      ])) : vue.createCommentVNode("v-if", true),
       vue.createCommentVNode(" 数据列表 "),
       vue.createElementVNode("scroll-view", {
         class: "list-container",
@@ -516,8 +582,43 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-1cf27b2a"], ["__file", "D:/app/om-engineer/pages/index/index.vue"]]);
-  const _sfc_main$5 = {
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1cf27b2a"], ["__file", "D:/app/om-engineer/pages/index/index.vue"]]);
+  function speak(text) {
+    const url = "https://tts.baidu.com/text2audio.mp3?tex=" + text + "&cuid=baike&amp&lan=ZH&amp&ctp=1&amp&pdt=301&amp&vol=100&amp&rate=32&amp&per=0&spd=10&pit=undefined";
+    if (typeof Audio !== "undefined") {
+      const audio = new Audio(url);
+      audio.play();
+    } else if (typeof wx !== "undefined" && wx.createInnerAudioContext) {
+      const innerAudioContext = wx.createInnerAudioContext();
+      innerAudioContext.src = url;
+      innerAudioContext.play();
+    } else if (typeof plus !== "undefined" && plus.audio) {
+      const player = plus.audio.createPlayer(url);
+      player.play(function() {
+        formatAppLog("log", "at utils/tts.js:19", "Play success");
+      }, function(e) {
+        formatAppLog("log", "at utils/tts.js:21", "Play failed: " + e.message);
+      });
+    } else if (typeof my !== "undefined" && my.createInnerAudioContext) {
+      const innerAudioContext = my.createInnerAudioContext();
+      innerAudioContext.src = url;
+      innerAudioContext.play();
+    } else if (typeof swan !== "undefined" && swan.createInnerAudioContext) {
+      const innerAudioContext = swan.createInnerAudioContext();
+      innerAudioContext.src = url;
+      innerAudioContext.play();
+    } else if (typeof tt !== "undefined" && tt.createInnerAudioContext) {
+      const innerAudioContext = tt.createInnerAudioContext();
+      innerAudioContext.src = url;
+      innerAudioContext.play();
+    } else {
+      formatAppLog("error", "at utils/tts.js:39", "Unsupported platform or Audio object is not defined");
+    }
+  }
+  const speak$1 = {
+    speak
+  };
+  const _sfc_main$6 = {
     data() {
       return {
         detailData: {
@@ -543,7 +644,7 @@ if (uni.restoreGlobal) {
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
           this.getDeviceOptions();
         } catch (e) {
-          formatAppLog("error", "at pages/fail/fail.vue:119", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/fail/fail.vue:124", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -576,7 +677,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/fail/fail.vue:159", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/fail/fail.vue:164", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -601,11 +702,13 @@ if (uni.restoreGlobal) {
                       title: "开始处理",
                       icon: "success"
                     });
+                    speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
                   } else {
                     uni.showToast({
                       title: "您有正在处理中的工单",
                       icon: "none"
                     });
+                    speak$1.speak("您有正在处理中的工单，请稍后重试");
                   }
                 },
                 fail: () => {
@@ -649,7 +752,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/fail/fail.vue:232", "解析响应失败", e);
+                  formatAppLog("error", "at pages/fail/fail.vue:244", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -657,7 +760,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/fail/fail.vue:240", "上传失败", err);
+                formatAppLog("error", "at pages/fail/fail.vue:252", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -675,7 +778,7 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/fail/fail.vue:258", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/fail/fail.vue:270", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
@@ -740,7 +843,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/fail/fail.vue:322", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/fail/fail.vue:334", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -786,11 +889,11 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/fail/fail.vue:368", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/fail/fail.vue:380", "状态已更新为:", this.getStatusText(newStatus));
       }
     }
   };
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createCommentVNode(" 设备名称 "),
       vue.createElementVNode("view", { class: "detail-card" }, [
@@ -877,22 +980,26 @@ if (uni.restoreGlobal) {
         ]),
         vue.createElementVNode("view", { class: "detail-content" }, [
           vue.createElementVNode("view", { class: "upload-container" }, [
-            vue.createElementVNode("view", {
+            !$data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
+              key: 0,
               class: "upload-area",
               onClick: _cache[1] || (_cache[1] = (...args) => $options.chooseImage && $options.chooseImage(...args))
             }, [
               vue.createElementVNode("text", { class: "upload-text" }, "点击上传图片")
-            ]),
-            $data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
-              key: 0,
-              class: "repair-image-container"
+            ])) : (vue.openBlock(), vue.createElementBlock("view", {
+              key: 1,
+              class: "repair-image-container",
+              onClick: _cache[2] || (_cache[2] = (...args) => $options.chooseImage && $options.chooseImage(...args))
             }, [
               vue.createElementVNode("image", {
                 src: $data.repairImageUrl,
                 mode: "widthFix",
                 class: "repair-image"
-              }, null, 8, ["src"])
-            ])) : vue.createCommentVNode("v-if", true)
+              }, null, 8, ["src"]),
+              vue.createElementVNode("view", { class: "ql-image-overlay" }, [
+                vue.createElementVNode("text", { class: "overlay-text" }, "点击更换图片")
+              ])
+            ]))
           ])
         ])
       ])) : vue.createCommentVNode("v-if", true),
@@ -904,7 +1011,7 @@ if (uni.restoreGlobal) {
         vue.createElementVNode("button", {
           class: "action-button",
           "hover-class": "action-button-hover",
-          onClick: _cache[2] || (_cache[2] = (...args) => $options.startProcessing && $options.startProcessing(...args))
+          onClick: _cache[3] || (_cache[3] = (...args) => $options.startProcessing && $options.startProcessing(...args))
         }, " 开始处理 ")
       ])) : vue.createCommentVNode("v-if", true),
       vue.createCommentVNode(" 完成维修按钮 (仅当状态为处理中时显示) "),
@@ -915,13 +1022,13 @@ if (uni.restoreGlobal) {
         vue.createElementVNode("button", {
           class: "action-button",
           "hover-class": "action-button-hover",
-          onClick: _cache[3] || (_cache[3] = (...args) => $options.completeRepair && $options.completeRepair(...args))
+          onClick: _cache[4] || (_cache[4] = (...args) => $options.completeRepair && $options.completeRepair(...args))
         }, " 完成维修 ")
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesFailFail = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-4cd3f726"], ["__file", "D:/app/om-engineer/pages/fail/fail.vue"]]);
-  const _sfc_main$4 = {
+  const PagesFailFail = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-4cd3f726"], ["__file", "D:/app/om-engineer/pages/fail/fail.vue"]]);
+  const _sfc_main$5 = {
     data() {
       return {
         detailData: {
@@ -963,9 +1070,9 @@ if (uni.restoreGlobal) {
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
           this.getDeviceOptions();
           this.getFenceInfo();
-          formatAppLog("log", "at pages/testOrder/testOrder.vue:130", this.detailData);
+          formatAppLog("log", "at pages/testOrder/testOrder.vue:136", this.detailData);
         } catch (e) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:132", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:138", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -994,6 +1101,11 @@ if (uni.restoreGlobal) {
       }
     },
     methods: {
+      navigateToMapPage() {
+        uni.navigateTo({
+          url: `/pages/map/map?lng=${this.fenceCenter[0]}&lat=${this.fenceCenter[1]}&radius=${this.fenceRadius}`
+        });
+      },
       async startProcessing() {
         try {
           const confirmResult = await new Promise((resolve) => {
@@ -1017,6 +1129,7 @@ if (uni.restoreGlobal) {
                 content: "您不在电子围栏范围内，请移步",
                 showCancel: false
               });
+              speak$1.speak("您不在电子围栏范围内，请移步");
               return;
             }
             const requestResult = await new Promise((resolve, reject) => {
@@ -1042,6 +1155,7 @@ if (uni.restoreGlobal) {
               this.updateStatus(2);
               this.getFenceInfo();
               this.startLocationCheck();
+              speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -1052,7 +1166,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:228", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:243", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -1145,7 +1259,7 @@ if (uni.restoreGlobal) {
             padding: [50, 50, 50, 50]
           });
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:327", "获取位置失败:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:342", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -1162,7 +1276,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:344", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:359", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -1262,7 +1376,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/testOrder/testOrder.vue:452", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/testOrder/testOrder.vue:467", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -1313,7 +1427,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/testOrder/testOrder.vue:502", "解析响应失败", e);
+                  formatAppLog("error", "at pages/testOrder/testOrder.vue:517", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -1321,7 +1435,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/testOrder/testOrder.vue:510", "上传失败", err);
+                formatAppLog("error", "at pages/testOrder/testOrder.vue:525", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -1346,12 +1460,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/testOrder/testOrder.vue:535", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/testOrder/testOrder.vue:550", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/testOrder/testOrder.vue:540", this.current);
+            formatAppLog("log", "at pages/testOrder/testOrder.vue:555", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/testOrder/finish/${this.detailData.id}`,
@@ -1398,7 +1512,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:594", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:609", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -1428,7 +1542,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/testOrder/testOrder.vue:623", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/testOrder/testOrder.vue:638", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -1474,25 +1588,21 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/testOrder/testOrder.vue:669", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/testOrder/testOrder.vue:684", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
-        vue.createElementVNode("view", { class: "map-container" }, [
-          vue.createElementVNode("map", {
-            id: "mapContainer",
-            style: { "width": "100%", "height": "300rpx" },
-            markers: $data.markers,
-            circles: $data.circles,
-            "show-location": true,
-            onRegionchange: _cache[0] || (_cache[0] = (...args) => _ctx.onRegionChange && _ctx.onRegionChange(...args))
-          }, null, 40, ["markers", "circles"])
+        vue.createElementVNode("view", { class: "map-button-container" }, [
+          vue.createElementVNode("button", {
+            class: "map-button",
+            onClick: _cache[0] || (_cache[0] = (...args) => $options.navigateToMapPage && $options.navigateToMapPage(...args))
+          }, " 查看电子围栏地图 ")
         ]),
         vue.createCommentVNode(" 设备名称 "),
         vue.createElementVNode("view", { class: "detail-card" }, [
@@ -1533,22 +1643,26 @@ if (uni.restoreGlobal) {
           ]),
           vue.createElementVNode("view", { class: "detail-content" }, [
             vue.createElementVNode("view", { class: "upload-container" }, [
-              vue.createElementVNode("view", {
+              !$data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
                 class: "upload-area",
                 onClick: _cache[1] || (_cache[1] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("text", { class: "upload-text" }, "点击上传图片")
-              ]),
-              $data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 0,
-                class: "repair-image-container"
+              ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "repair-image-container",
+                onClick: _cache[2] || (_cache[2] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("image", {
                   src: $data.repairImageUrl,
                   mode: "widthFix",
                   class: "repair-image"
-                }, null, 8, ["src"])
-              ])) : vue.createCommentVNode("v-if", true)
+                }, null, 8, ["src"]),
+                vue.createElementVNode("view", { class: "ql-image-overlay" }, [
+                  vue.createElementVNode("text", { class: "overlay-text" }, "点击更换图片")
+                ])
+              ]))
             ])
           ])
         ])) : vue.createCommentVNode("v-if", true),
@@ -1560,7 +1674,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[2] || (_cache[2] = (...args) => $options.startProcessing && $options.startProcessing(...args))
+            onClick: _cache[3] || (_cache[3] = (...args) => $options.startProcessing && $options.startProcessing(...args))
           }, " 开始处理 ")
         ])) : vue.createCommentVNode("v-if", true),
         vue.createCommentVNode(" 正常异常单选框 (仅当状态为处理中时显示) "),
@@ -1571,7 +1685,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode(
             "radio-group",
             {
-              onChange: _cache[3] || (_cache[3] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
+              onChange: _cache[4] || (_cache[4] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
             },
             [
               vue.createElementVNode("label", null, [
@@ -1632,14 +1746,14 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[4] || (_cache[4] = (...args) => $options.completeRepair && $options.completeRepair(...args))
+            onClick: _cache[5] || (_cache[5] = (...args) => $options.completeRepair && $options.completeRepair(...args))
           }, " 完成检测 ")
         ])) : vue.createCommentVNode("v-if", true)
       ])
     ]);
   }
-  const PagesTestOrderTestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-7e3f3e94"], ["__file", "D:/app/om-engineer/pages/testOrder/testOrder.vue"]]);
-  const _sfc_main$3 = {
+  const PagesTestOrderTestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7e3f3e94"], ["__file", "D:/app/om-engineer/pages/testOrder/testOrder.vue"]]);
+  const _sfc_main$4 = {
     data() {
       return {
         form: {
@@ -1690,7 +1804,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "form-card" }, [
         vue.createElementVNode("view", { class: "form-item" }, [
@@ -1718,8 +1832,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesSpareSpare = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-bd81fea5"], ["__file", "D:/app/om-engineer/pages/spare/spare.vue"]]);
-  const _sfc_main$2 = {
+  const PagesSpareSpare = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-bd81fea5"], ["__file", "D:/app/om-engineer/pages/spare/spare.vue"]]);
+  const _sfc_main$3 = {
     data() {
       return {
         detailData: {
@@ -1761,9 +1875,9 @@ if (uni.restoreGlobal) {
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
           this.getDeviceOptions();
           this.getFenceInfo();
-          formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:130", this.detailData);
+          formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:136", this.detailData);
         } catch (e) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:132", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:138", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -1792,6 +1906,11 @@ if (uni.restoreGlobal) {
       }
     },
     methods: {
+      navigateToMapPage() {
+        uni.navigateTo({
+          url: `/pages/map/map?lng=${this.fenceCenter[0]}&lat=${this.fenceCenter[1]}&radius=${this.fenceRadius}`
+        });
+      },
       async startProcessing() {
         try {
           const confirmResult = await new Promise((resolve) => {
@@ -1840,6 +1959,7 @@ if (uni.restoreGlobal) {
               this.updateStatus(2);
               this.getFenceInfo();
               this.startLocationCheck();
+              speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -1850,7 +1970,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:228", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:241", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -1943,7 +2063,7 @@ if (uni.restoreGlobal) {
             padding: [50, 50, 50, 50]
           });
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:327", "获取位置失败:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:340", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -1960,7 +2080,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:344", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:357", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -2060,7 +2180,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:452", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:465", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -2111,7 +2231,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:502", "解析响应失败", e);
+                  formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:515", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -2119,7 +2239,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:510", "上传失败", err);
+                formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:523", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -2144,12 +2264,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:535", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:548", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:540", this.current);
+            formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:553", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/rtestOrder/finish/${this.detailData.id}`,
@@ -2196,7 +2316,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:594", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:607", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -2226,7 +2346,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:623", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:636", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -2272,25 +2392,21 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:669", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:682", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
-        vue.createElementVNode("view", { class: "map-container" }, [
-          vue.createElementVNode("map", {
-            id: "mapContainer",
-            style: { "width": "100%", "height": "300rpx" },
-            markers: $data.markers,
-            circles: $data.circles,
-            "show-location": true,
-            onRegionchange: _cache[0] || (_cache[0] = (...args) => _ctx.onRegionChange && _ctx.onRegionChange(...args))
-          }, null, 40, ["markers", "circles"])
+        vue.createElementVNode("view", { class: "map-button-container" }, [
+          vue.createElementVNode("button", {
+            class: "map-button",
+            onClick: _cache[0] || (_cache[0] = (...args) => $options.navigateToMapPage && $options.navigateToMapPage(...args))
+          }, " 查看电子围栏地图 ")
         ]),
         vue.createCommentVNode(" 设备名称 "),
         vue.createElementVNode("view", { class: "detail-card" }, [
@@ -2331,22 +2447,26 @@ if (uni.restoreGlobal) {
           ]),
           vue.createElementVNode("view", { class: "detail-content" }, [
             vue.createElementVNode("view", { class: "upload-container" }, [
-              vue.createElementVNode("view", {
+              !$data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
                 class: "upload-area",
                 onClick: _cache[1] || (_cache[1] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("text", { class: "upload-text" }, "点击上传图片")
-              ]),
-              $data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 0,
-                class: "repair-image-container"
+              ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "repair-image-container",
+                onClick: _cache[2] || (_cache[2] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("image", {
                   src: $data.repairImageUrl,
                   mode: "widthFix",
                   class: "repair-image"
-                }, null, 8, ["src"])
-              ])) : vue.createCommentVNode("v-if", true)
+                }, null, 8, ["src"]),
+                vue.createElementVNode("view", { class: "ql-image-overlay" }, [
+                  vue.createElementVNode("text", { class: "overlay-text" }, "点击更换图片")
+                ])
+              ]))
             ])
           ])
         ])) : vue.createCommentVNode("v-if", true),
@@ -2358,7 +2478,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[2] || (_cache[2] = (...args) => $options.startProcessing && $options.startProcessing(...args))
+            onClick: _cache[3] || (_cache[3] = (...args) => $options.startProcessing && $options.startProcessing(...args))
           }, " 开始处理 ")
         ])) : vue.createCommentVNode("v-if", true),
         vue.createCommentVNode(" 正常异常单选框 (仅当状态为处理中时显示) "),
@@ -2369,7 +2489,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode(
             "radio-group",
             {
-              onChange: _cache[3] || (_cache[3] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
+              onChange: _cache[4] || (_cache[4] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
             },
             [
               vue.createElementVNode("label", null, [
@@ -2430,16 +2550,17 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[4] || (_cache[4] = (...args) => $options.completeRepair && $options.completeRepair(...args))
+            onClick: _cache[5] || (_cache[5] = (...args) => $options.completeRepair && $options.completeRepair(...args))
           }, " 完成检测 ")
         ])) : vue.createCommentVNode("v-if", true)
       ])
     ]);
   }
-  const PagesRtestOrderRtestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-134de0b2"], ["__file", "D:/app/om-engineer/pages/rtestOrder/rtestOrder.vue"]]);
-  const _sfc_main$1 = {
+  const PagesRtestOrderRtestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-134de0b2"], ["__file", "D:/app/om-engineer/pages/rtestOrder/rtestOrder.vue"]]);
+  const _sfc_main$2 = {
     data() {
       return {
+        includePoints: [],
         detailData: {
           id: "",
           deviceId: "",
@@ -2479,9 +2600,8 @@ if (uni.restoreGlobal) {
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
           this.getDeviceOptions();
           this.getFenceInfo();
-          formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:130", this.detailData);
         } catch (e) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:132", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:138", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -2510,6 +2630,35 @@ if (uni.restoreGlobal) {
       }
     },
     methods: {
+      navigateToMapPage() {
+        uni.navigateTo({
+          url: `/pages/map/map?lng=${this.fenceCenter[0]}&lat=${this.fenceCenter[1]}&radius=${this.fenceRadius}`
+        });
+      },
+      // 修改后的获取围栏信息方法
+      getFenceInfo() {
+        uni.request({
+          url: `${baseConfig.baseUrl}/engineer/device/get/${this.detailData.deviceId}`,
+          method: "GET",
+          header: {
+            "Authorization": `Bearer ${this.token}`
+          },
+          success: (res) => {
+            if (res.data.code === 200) {
+              this.fenceCenter = [
+                parseFloat(res.data.data.centerLng),
+                parseFloat(res.data.data.centerLat)
+              ];
+              this.fenceRadius = parseFloat(res.data.data.radius);
+              this.includePoints = [{
+                latitude: this.fenceCenter[1],
+                longitude: this.fenceCenter[0]
+              }];
+              this.initMapOverlays(true);
+            }
+          }
+        });
+      },
       async startProcessing() {
         try {
           const confirmResult = await new Promise((resolve) => {
@@ -2533,6 +2682,7 @@ if (uni.restoreGlobal) {
                 content: "您不在电子围栏范围内，请移步",
                 showCancel: false
               });
+              speak$1.speak("您不在电子围栏范围内，请移步");
               return;
             }
             const requestResult = await new Promise((resolve, reject) => {
@@ -2558,6 +2708,7 @@ if (uni.restoreGlobal) {
               this.updateStatus(2);
               this.getFenceInfo();
               this.startLocationCheck();
+              speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -2568,7 +2719,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:228", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:271", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -2607,14 +2758,15 @@ if (uni.restoreGlobal) {
         });
       },
       // 初始化地图覆盖物
-      initMapOverlays() {
-        var _a, _b;
-        if (!this.fenceCenter)
+      initMapOverlays(force = false) {
+        if (!this.fenceCenter || !this.fenceRadius)
           return;
         const fenceMarker = {
           id: 0,
           latitude: this.fenceCenter[1],
+          // 纬度
           longitude: this.fenceCenter[0],
+          // 经度
           title: "设备位置",
           iconPath: "/static/fence-marker.png",
           width: 30,
@@ -2623,45 +2775,53 @@ if (uni.restoreGlobal) {
         const fenceCircle = {
           latitude: this.fenceCenter[1],
           longitude: this.fenceCenter[0],
-          radius: this.fenceRadius,
+          radius: Number(this.fenceRadius),
           strokeWidth: 2,
           strokeColor: "#FF0000",
           fillColor: "#FF000022"
         };
-        const userMarker = {
+        const userMarker = this.userLocation ? {
           id: 1,
-          latitude: (_a = this.userLocation) == null ? void 0 : _a.latitude,
-          longitude: (_b = this.userLocation) == null ? void 0 : _b.longitude,
+          latitude: this.userLocation.latitude,
+          longitude: this.userLocation.longitude,
           title: "我的位置",
           iconPath: "/static/user-marker.png",
           width: 20,
-          height: 20,
-          rotate: 0
-        };
-        this.markers = [fenceMarker, userMarker].filter(Boolean);
+          height: 20
+        } : null;
+        this.markers = [fenceMarker].concat(userMarker || []);
         this.circles = [fenceCircle];
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:349", "当前覆盖物：", {
+          markers: this.markers,
+          circles: this.circles
+        });
       },
       // 更新用户位置标记
       async updateUserPosition() {
         try {
           const location = await this.getCurrentLocation();
           this.userLocation = location;
+          this.includePoints = [
+            {
+              latitude: this.fenceCenter[1],
+              longitude: this.fenceCenter[0]
+            },
+            {
+              latitude: location.latitude,
+              longitude: location.longitude
+            }
+          ];
           this.initMapOverlays();
-          this.mapCtx.includePoints({
-            points: [
-              {
-                latitude: this.fenceCenter[1],
-                longitude: this.fenceCenter[0]
-              },
-              {
-                latitude: location.latitude,
-                longitude: location.longitude
-              }
-            ],
-            padding: [50, 50, 50, 50]
-          });
+          if (uni.getSystemInfoSync().platform === "android") {
+            this.$nextTick(() => {
+              this.mapCtx.includePoints({
+                points: this.includePoints,
+                padding: [50, 50, 50, 50]
+              });
+            });
+          }
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:327", "获取位置失败:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:385", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -2678,7 +2838,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:344", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:402", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -2724,27 +2884,6 @@ if (uni.restoreGlobal) {
           this.timer = null;
         }
       },
-      // 修改后的获取围栏信息方法
-      getFenceInfo() {
-        uni.request({
-          url: `${baseConfig.baseUrl}/engineer/device/get/${this.detailData.deviceId}`,
-          method: "GET",
-          header: {
-            "Authorization": `Bearer ${this.token}`
-          },
-          success: (res) => {
-            if (res.data.code === 200) {
-              this.fenceCenter = [res.data.data.centerLng, res.data.data.centerLat];
-              this.fenceRadius = res.data.data.radius;
-              this.initMapOverlays();
-              this.updateUserPosition();
-              this.$nextTick(() => {
-                this.mapCtx = uni.createMapContext("mapContainer", this);
-              });
-            }
-          }
-        });
-      },
       // 安卓地图显示
       showFenceMap() {
         if (!this.fenceCenter || this.fenceCenter.length !== 2) {
@@ -2778,7 +2917,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:452", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:489", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -2829,7 +2968,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:502", "解析响应失败", e);
+                  formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:539", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -2837,7 +2976,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:510", "上传失败", err);
+                formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:547", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -2862,12 +3001,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:535", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:572", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:540", this.current);
+            formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:577", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/baoyangOrder/finish/${this.detailData.id}`,
@@ -2914,7 +3053,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:594", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:631", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -2944,7 +3083,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:623", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:660", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -2990,25 +3129,21 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:669", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:706", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
-        vue.createElementVNode("view", { class: "map-container" }, [
-          vue.createElementVNode("map", {
-            id: "mapContainer",
-            style: { "width": "100%", "height": "300rpx" },
-            markers: $data.markers,
-            circles: $data.circles,
-            "show-location": true,
-            onRegionchange: _cache[0] || (_cache[0] = (...args) => _ctx.onRegionChange && _ctx.onRegionChange(...args))
-          }, null, 40, ["markers", "circles"])
+        vue.createElementVNode("view", { class: "map-button-container" }, [
+          vue.createElementVNode("button", {
+            class: "map-button",
+            onClick: _cache[0] || (_cache[0] = (...args) => $options.navigateToMapPage && $options.navigateToMapPage(...args))
+          }, " 查看电子围栏地图 ")
         ]),
         vue.createCommentVNode(" 设备名称 "),
         vue.createElementVNode("view", { class: "detail-card" }, [
@@ -3049,22 +3184,26 @@ if (uni.restoreGlobal) {
           ]),
           vue.createElementVNode("view", { class: "detail-content" }, [
             vue.createElementVNode("view", { class: "upload-container" }, [
-              vue.createElementVNode("view", {
+              !$data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
+                key: 0,
                 class: "upload-area",
                 onClick: _cache[1] || (_cache[1] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("text", { class: "upload-text" }, "点击上传图片")
-              ]),
-              $data.repairImageUrl ? (vue.openBlock(), vue.createElementBlock("view", {
-                key: 0,
-                class: "repair-image-container"
+              ])) : (vue.openBlock(), vue.createElementBlock("view", {
+                key: 1,
+                class: "repair-image-container",
+                onClick: _cache[2] || (_cache[2] = (...args) => $options.chooseImage && $options.chooseImage(...args))
               }, [
                 vue.createElementVNode("image", {
                   src: $data.repairImageUrl,
                   mode: "widthFix",
                   class: "repair-image"
-                }, null, 8, ["src"])
-              ])) : vue.createCommentVNode("v-if", true)
+                }, null, 8, ["src"]),
+                vue.createElementVNode("view", { class: "ql-image-overlay" }, [
+                  vue.createElementVNode("text", { class: "overlay-text" }, "点击更换图片")
+                ])
+              ]))
             ])
           ])
         ])) : vue.createCommentVNode("v-if", true),
@@ -3076,7 +3215,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[2] || (_cache[2] = (...args) => $options.startProcessing && $options.startProcessing(...args))
+            onClick: _cache[3] || (_cache[3] = (...args) => $options.startProcessing && $options.startProcessing(...args))
           }, " 开始处理 ")
         ])) : vue.createCommentVNode("v-if", true),
         vue.createCommentVNode(" 正常异常单选框 (仅当状态为处理中时显示) "),
@@ -3087,7 +3226,7 @@ if (uni.restoreGlobal) {
           vue.createElementVNode(
             "radio-group",
             {
-              onChange: _cache[3] || (_cache[3] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
+              onChange: _cache[4] || (_cache[4] = (...args) => $options.onRadioChange && $options.onRadioChange(...args))
             },
             [
               vue.createElementVNode("label", null, [
@@ -3148,13 +3287,171 @@ if (uni.restoreGlobal) {
           vue.createElementVNode("button", {
             class: "action-button",
             "hover-class": "action-button-hover",
-            onClick: _cache[4] || (_cache[4] = (...args) => $options.completeRepair && $options.completeRepair(...args))
+            onClick: _cache[5] || (_cache[5] = (...args) => $options.completeRepair && $options.completeRepair(...args))
           }, " 完成检测 ")
         ])) : vue.createCommentVNode("v-if", true)
       ])
     ]);
   }
-  const PagesBaoyangOrderBaoyangOrder = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-6915bd98"], ["__file", "D:/app/om-engineer/pages/baoyangOrder/baoyangOrder.vue"]]);
+  const PagesBaoyangOrderBaoyangOrder = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-6915bd98"], ["__file", "D:/app/om-engineer/pages/baoyangOrder/baoyangOrder.vue"]]);
+  const _sfc_main$1 = {
+    data() {
+      return {
+        centerLng: 116.397428,
+        // 默认北京中心坐标
+        centerLat: 39.90923,
+        radius: 100,
+        // 电子围栏半径
+        markers: [],
+        // 地图标记
+        circles: [],
+        // 电子围栏圆形
+        mapCtx: null,
+        // 地图上下文
+        locationInterval: null
+        // 定位定时器
+      };
+    },
+    onLoad(options) {
+      if (options.lng && options.lat) {
+        this.centerLng = parseFloat(options.lng);
+        this.centerLat = parseFloat(options.lat);
+      }
+      if (options.radius) {
+        this.radius = parseFloat(options.radius);
+      }
+      this.initMap();
+      this.startLocationWatch();
+    },
+    methods: {
+      // 初始化地图
+      async initMap() {
+        this.mapCtx = uni.createMapContext("mapContainer", this);
+        this.circles = [{
+          latitude: this.centerLat,
+          longitude: this.centerLng,
+          radius: this.radius,
+          strokeWidth: 2,
+          strokeColor: "#FF0000",
+          fillColor: "#FF000033"
+        }];
+        this.markers.push({
+          id: 0,
+          latitude: this.centerLat,
+          longitude: this.centerLng,
+          iconPath: "/static/device-marker.png",
+          width: 40,
+          height: 40,
+          title: "电子围栏中心"
+        });
+        try {
+          const location = await this.getCurrentLocation();
+          this.updateUserPosition(location);
+        } catch (e) {
+          uni.showToast({
+            title: "获取位置失败",
+            icon: "none"
+          });
+        }
+      },
+      // 获取当前位置
+      getCurrentLocation() {
+        return new Promise((resolve, reject) => {
+          uni.getLocation({
+            type: "gcj02",
+            altitude: true,
+            success: resolve,
+            fail: reject
+          });
+        });
+      },
+      // 更新用户位置标记
+      updateUserPosition(location) {
+        const userMarker = {
+          id: 1,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          iconPath: "/static/user-marker.png",
+          width: 30,
+          height: 30,
+          title: "我的位置"
+        };
+        this.markers = [this.markers[0], userMarker];
+        this.mapCtx.includePoints({
+          points: [
+            {
+              latitude: this.centerLat,
+              longitude: this.centerLng
+            },
+            {
+              latitude: location.latitude,
+              longitude: location.longitude
+            }
+          ],
+          padding: [40, 40, 80, 40]
+          // 下边距加大给按钮留空间
+        });
+      },
+      // 开启持续定位
+      startLocationWatch() {
+        this.locationInterval = setInterval(async () => {
+          try {
+            const location = await this.getCurrentLocation();
+            this.updateUserPosition(location);
+          } catch (e) {
+            formatAppLog("error", "at pages/map/map.vue:129", "位置更新失败:", e);
+          }
+        }, 5e3);
+      },
+      // 打开地图导航
+      openNavigation() {
+        uni.openLocation({
+          latitude: this.centerLat,
+          longitude: this.centerLng,
+          name: "电子围栏中心",
+          address: "目标位置",
+          scale: 18
+        });
+      },
+      // 返回上一页
+      goBack() {
+        uni.navigateBack({
+          delta: 1
+        });
+      }
+    },
+    onUnload() {
+      clearInterval(this.locationInterval);
+      this.mapCtx = null;
+    }
+  };
+  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "map-container" }, [
+      vue.createCommentVNode(" 地图组件 "),
+      vue.createElementVNode("map", {
+        id: "mapContainer",
+        latitude: $data.centerLat,
+        longitude: $data.centerLng,
+        markers: $data.markers,
+        circles: $data.circles,
+        scale: 16,
+        "show-location": true,
+        style: { "width": "100%", "height": "100vh" }
+      }, null, 8, ["latitude", "longitude", "markers", "circles"]),
+      vue.createCommentVNode(" 使用普通view覆盖按钮 "),
+      vue.createElementVNode("view", { class: "button-container" }, [
+        vue.createElementVNode("button", {
+          class: "nav-button",
+          onClick: _cache[0] || (_cache[0] = (...args) => $options.openNavigation && $options.openNavigation(...args))
+        }, "导航"),
+        vue.createElementVNode("button", {
+          class: "nav-button back-button",
+          onClick: _cache[1] || (_cache[1] = (...args) => $options.goBack && $options.goBack(...args))
+        }, "返回")
+      ])
+    ]);
+  }
+  const PagesMapMap = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "D:/app/om-engineer/pages/map/map.vue"]]);
   __definePage("pages/login/login", PagesLoginLogin);
   __definePage("pages/index/index", PagesIndexIndex);
   __definePage("pages/fail/fail", PagesFailFail);
@@ -3162,6 +3459,7 @@ if (uni.restoreGlobal) {
   __definePage("pages/spare/spare", PagesSpareSpare);
   __definePage("pages/rtestOrder/rtestOrder", PagesRtestOrderRtestOrder);
   __definePage("pages/baoyangOrder/baoyangOrder", PagesBaoyangOrderBaoyangOrder);
+  __definePage("pages/map/map", PagesMapMap);
   const _sfc_main = {
     onLaunch() {
       websocketObj.setMessageHandler(this.handleGlobalMessage);

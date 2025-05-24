@@ -1,9 +1,10 @@
 <template>
 	<view class="container">
 		<view class="container">
-			<view class="map-container">
-				<map id="mapContainer" style="width:100%;height:300rpx" :markers="markers" :circles="circles"
-					:show-location="true" @regionchange="onRegionChange"></map>
+			<view class="map-button-container">
+				<button class="map-button" @tap="navigateToMapPage">
+					查看电子围栏地图
+				</button>
 			</view>
 			<!-- 设备名称 -->
 			<view class="detail-card">
@@ -31,11 +32,14 @@
 				</view>
 				<view class="detail-content">
 					<view class="upload-container">
-						<view class="upload-area" @click="chooseImage">
+						<view v-if="!repairImageUrl" class="upload-area" @click="chooseImage">
 							<text class="upload-text">点击上传图片</text>
 						</view>
-						<view v-if="repairImageUrl" class="repair-image-container">
+						<view v-else class="repair-image-container" @click="chooseImage">
 							<image :src="repairImageUrl" mode="widthFix" class="repair-image"></image>
+							<view class="ql-image-overlay">
+								<text class="overlay-text">点击更换图片</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -89,6 +93,8 @@
 	import {
 		baseConfig
 	} from '../../utils/config';
+
+	import speak from "@/utils/tts.js";
 
 	export default {
 		data() {
@@ -157,6 +163,11 @@
 			}
 		},
 		methods: {
+			navigateToMapPage() {
+				uni.navigateTo({
+					url: `/pages/map/map?lng=${this.fenceCenter[0]}&lat=${this.fenceCenter[1]}&radius=${this.fenceRadius}`
+				});
+			},
 			async startProcessing() {
 				try {
 					const confirmResult = await new Promise((resolve) => {
@@ -214,6 +225,8 @@
 
 							// 4. 启动围栏检测
 							this.startLocationCheck();
+
+							speak.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效")
 						} else if (requestResult.data.code === 0) {
 							// 根据后端返回的错误信息显示相应的弹框
 							const errorMessage = requestResult.data.msg;
@@ -676,33 +689,39 @@
 </script>
 
 <style scoped>
-	/* 增强地图容器样式 */
-	.map-container {
-		margin: 20rpx;
-		height: 350rpx;
-		border-radius: 16rpx;
-		overflow: hidden;
+	.repair-image-container {
+		width: 100%;
+		height: 100%;
 		position: relative;
+		cursor: pointer;
 	}
 
-	.map-container::after {
-		content: '电子围栏区域';
+	.overlay-text {
+		font-size: 12px;
+	}
+
+	.image-overlay {
 		position: absolute;
-		bottom: 10rpx;
-		right: 10rpx;
-		background: rgba(0, 0, 0, 0.6);
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.6);
 		color: white;
-		padding: 8rpx 16rpx;
-		border-radius: 8rpx;
-		font-size: 24rpx;
+		padding: 6px;
+		text-align: center;
+		opacity: 0;
+		transition: opacity 0.3s;
+		border-radius: 0 0 8px 8px;
 	}
 
-	.countdown-container {
-		padding: 20rpx;
-		background-color: #fff;
-		border-radius: 10rpx;
-		margin: 20rpx;
-		text-align: center;
+	.map-button-container {
+		padding: 30rpx;
+	}
+
+	.map-button {
+		background: #1890ff;
+		color: white;
+		border-radius: 50rpx;
 	}
 
 	.countdown-text {

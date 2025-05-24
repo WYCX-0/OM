@@ -57,11 +57,14 @@
 			</view>
 			<view class="detail-content">
 				<view class="upload-container">
-					<view class="upload-area" @click="chooseImage">
+					<view v-if="!repairImageUrl" class="upload-area" @click="chooseImage">
 						<text class="upload-text">点击上传图片</text>
 					</view>
-					<view v-if="repairImageUrl" class="repair-image-container">
+					<view v-else class="repair-image-container" @click="chooseImage">
 						<image :src="repairImageUrl" mode="widthFix" class="repair-image"></image>
+						<view class="ql-image-overlay">
+							<text class="overlay-text">点击更换图片</text>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -87,6 +90,8 @@
 	import {
 		baseConfig
 	} from '../../utils/config';
+
+	import speak from "@/utils/tts.js";
 
 
 	export default {
@@ -180,11 +185,16 @@
 											title: '开始处理',
 											icon: 'success'
 										});
+
+										// 故障维修安全要求语音播报
+
+										speak.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效")
 									} else {
 										uni.showToast({
 											title: '您有正在处理中的工单',
 											icon: 'none'
 										});
+										speak.speak("您有正在处理中的工单，请稍后重试")
 									}
 								},
 								fail: () => {
@@ -198,6 +208,8 @@
 					}
 				});
 			},
+
+
 			chooseImage() {
 				uni.chooseImage({
 					count: 1,
@@ -372,6 +384,31 @@
 </script>
 
 <style scoped>
+	.repair-image-container {
+		width: 100%;
+		height: 100%;
+		position: relative;
+		cursor: pointer;
+	}
+
+	.overlay-text {
+		font-size: 12px;
+	}
+
+	.image-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.6);
+		color: white;
+		padding: 6px;
+		text-align: center;
+		opacity: 0;
+		transition: opacity 0.3s;
+		border-radius: 0 0 8px 8px;
+	}
+
 	/* 全局样式 */
 	.container {
 		padding: 20rpx;

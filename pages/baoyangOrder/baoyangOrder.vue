@@ -1,9 +1,10 @@
 <template>
 	<view class="container">
 		<view class="container">
-			<view class="map-container">
-				<map id="mapContainer" style="width:100%;height:300rpx" :markers="markers" :circles="circles"
-					:show-location="true" @regionchange="onRegionChange"></map>
+			<view class="map-button-container">
+				<button class="map-button" @tap="navigateToMapPage">
+					查看电子围栏地图
+				</button>
 			</view>
 			<!-- 设备名称 -->
 			<view class="detail-card">
@@ -31,11 +32,14 @@
 				</view>
 				<view class="detail-content">
 					<view class="upload-container">
-						<view class="upload-area" @click="chooseImage">
+						<view v-if="!repairImageUrl" class="upload-area" @click="chooseImage">
 							<text class="upload-text">点击上传图片</text>
 						</view>
-						<view v-if="repairImageUrl" class="repair-image-container">
+						<view v-else class="repair-image-container" @click="chooseImage">
 							<image :src="repairImageUrl" mode="widthFix" class="repair-image"></image>
+							<view class="ql-image-overlay">
+								<text class="overlay-text">点击更换图片</text>
+							</view>
 						</view>
 					</view>
 				</view>
@@ -90,9 +94,12 @@
 		baseConfig
 	} from '../../utils/config';
 
+	import speak from "@/utils/tts.js";
+
 	export default {
 		data() {
 			return {
+				includePoints: [],
 				detailData: {
 					id: '',
 					deviceId: '',
@@ -127,7 +134,6 @@
 					this.detailData = JSON.parse(decodeURIComponent(options.detailData));
 					this.getDeviceOptions(); // 获取设备选项
 					this.getFenceInfo();
-					console.log(this.detailData);
 				} catch (e) {
 					console.error('解析详情数据失败', e);
 					uni.showToast({
@@ -157,6 +163,40 @@
 			}
 		},
 		methods: {
+			navigateToMapPage() {
+				uni.navigateTo({
+					url: `/pages/map/map?lng=${this.fenceCenter[0]}&lat=${this.fenceCenter[1]}&radius=${this.fenceRadius}`
+				});
+			},
+			// 修改后的获取围栏信息方法
+			getFenceInfo() {
+				uni.request({
+					url: `${baseConfig.baseUrl}/engineer/device/get/${this.detailData.deviceId}`,
+					method: 'GET',
+					header: {
+						'Authorization': `Bearer ${this.token}`
+					},
+					success: (res) => {
+						if (res.data.code === 200) {
+							// 添加类型转换和坐标处理
+							this.fenceCenter = [
+								parseFloat(res.data.data.centerLng),
+								parseFloat(res.data.data.centerLat)
+							];
+							this.fenceRadius = parseFloat(res.data.data.radius);
+
+							// 设置初始视野
+							this.includePoints = [{
+								latitude: this.fenceCenter[1],
+								longitude: this.fenceCenter[0]
+							}];
+
+							// 强制更新覆盖物
+							this.initMapOverlays(true);
+						}
+					}
+				});
+			},
 			async startProcessing() {
 				try {
 					const confirmResult = await new Promise((resolve) => {
@@ -183,6 +223,7 @@
 								content: '您不在电子围栏范围内，请移步',
 								showCancel: false
 							});
+							speak.speak("您不在电子围栏范围内，请移步")
 							return;
 						}
 
@@ -214,6 +255,8 @@
 
 							// 4. 启动围栏检测
 							this.startLocationCheck();
+
+							speak.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效")
 						} else if (requestResult.data.code === 0) {
 							// 根据后端返回的错误信息显示相应的弹框
 							const errorMessage = requestResult.data.msg;
@@ -264,65 +307,80 @@
 				});
 			},
 			// 初始化地图覆盖物
-			initMapOverlays() {
-				if (!this.fenceCenter) return;
+			initMapOverlays(force = false) {
+				if (!this.fenceCenter || !this.fenceRadius) return;
 
-				// 围栏中心标记
+				// 围栏标记（确保使用正确坐标顺序）
 				const fenceMarker = {
 					id: 0,
-					latitude: this.fenceCenter[1],
-					longitude: this.fenceCenter[0],
+					latitude: this.fenceCenter[1], // 纬度
+					longitude: this.fenceCenter[0], // 经度
 					title: '设备位置',
 					iconPath: '/static/fence-marker.png',
 					width: 30,
 					height: 30
 				};
 
-				// 围栏范围圆圈
+				// 围栏圆圈
 				const fenceCircle = {
 					latitude: this.fenceCenter[1],
 					longitude: this.fenceCenter[0],
-					radius: this.fenceRadius,
+					radius: Number(this.fenceRadius),
 					strokeWidth: 2,
 					strokeColor: '#FF0000',
 					fillColor: '#FF000022'
 				};
 
-				// 用户位置标记
-				const userMarker = {
+				// 用户位置标记（可选显示）
+				const userMarker = this.userLocation ? {
 					id: 1,
-					latitude: this.userLocation?.latitude,
-					longitude: this.userLocation?.longitude,
+					latitude: this.userLocation.latitude,
+					longitude: this.userLocation.longitude,
 					title: '我的位置',
 					iconPath: '/static/user-marker.png',
 					width: 20,
-					height: 20,
-					rotate: 0
-				};
+					height: 20
+				} : null;
 
-				this.markers = [fenceMarker, userMarker].filter(Boolean);
+				// 更新覆盖物数组
+				this.markers = [fenceMarker].concat(userMarker || []);
 				this.circles = [fenceCircle];
+
+				console.log('当前覆盖物：', {
+					markers: this.markers,
+					circles: this.circles
+				});
 			},
 			// 更新用户位置标记
 			async updateUserPosition() {
 				try {
 					const location = await this.getCurrentLocation();
 					this.userLocation = location;
+
+					// 更新视野包含两个点
+					this.includePoints = [{
+							latitude: this.fenceCenter[1],
+							longitude: this.fenceCenter[0]
+						},
+						{
+							latitude: location.latitude,
+							longitude: location.longitude
+						}
+					];
+
+					// 更新覆盖物
 					this.initMapOverlays();
 
-					// 自动调整地图视野
-					this.mapCtx.includePoints({
-						points: [{
-								latitude: this.fenceCenter[1],
-								longitude: this.fenceCenter[0]
-							},
-							{
-								latitude: location.latitude,
-								longitude: location.longitude
-							}
-						],
-						padding: [50, 50, 50, 50]
-					});
+					// 安卓端需要特殊处理
+					if (uni.getSystemInfoSync().platform === 'android') {
+						this.$nextTick(() => {
+							this.mapCtx.includePoints({
+								points: this.includePoints,
+								padding: [50, 50, 50, 50]
+							});
+						});
+					}
+
 				} catch (error) {
 					console.error('获取位置失败:', error);
 				}
@@ -392,28 +450,7 @@
 					this.timer = null;
 				}
 			},
-			// 修改后的获取围栏信息方法
-			getFenceInfo() {
-				uni.request({
-					url: `${baseConfig.baseUrl}/engineer/device/get/${this.detailData.deviceId}`,
-					method: 'GET',
-					header: {
-						'Authorization': `Bearer ${this.token}`
-					},
-					success: (res) => {
-						if (res.data.code === 200) {
-							this.fenceCenter = [res.data.data.centerLng, res.data.data.centerLat];
-							this.fenceRadius = res.data.data.radius;
-							this.initMapOverlays();
-							this.updateUserPosition();
-							// 确保地图组件初始化
-							this.$nextTick(() => {
-								this.mapCtx = uni.createMapContext('mapContainer', this);
-							});
-						}
-					}
-				});
-			},
+
 			// 安卓地图显示
 			showFenceMap() {
 				if (!this.fenceCenter || this.fenceCenter.length !== 2) {
@@ -676,6 +713,41 @@
 </script>
 
 <style scoped>
+	.repair-image-container {
+		width: 100%;
+		height: 100%;
+		position: relative;
+		cursor: pointer;
+	}
+
+	.overlay-text {
+		font-size: 12px;
+	}
+
+	.image-overlay {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.6);
+		color: white;
+		padding: 6px;
+		text-align: center;
+		opacity: 0;
+		transition: opacity 0.3s;
+		border-radius: 0 0 8px 8px;
+	}
+
+	.map-button-container {
+		padding: 30rpx;
+	}
+
+	.map-button {
+		background: #1890ff;
+		color: white;
+		border-radius: 50rpx;
+	}
+
 	/* 增强地图容器样式 */
 	.map-container {
 		margin: 20rpx;

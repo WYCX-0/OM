@@ -1,4 +1,4 @@
 export const baseConfig = {
-	baseUrl: 'http://192.168.163.195:9090',
-	wsBaseUrl: 'ws://192.168.163.195:9090'
+	baseUrl: 'http://192.168.225.195:9090',
+	wsBaseUrl: 'ws://192.168.225.195:9090'
 }

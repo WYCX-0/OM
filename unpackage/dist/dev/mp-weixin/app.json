@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/fail/fail",
+    "pages/testOrder/testOrder",
+    "pages/spare/spare",
+    "pages/rtestOrder/rtestOrder",
+    "pages/baoyangOrder/baoyangOrder"
+  ],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "usingComponents": {}
+}

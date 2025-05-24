@@ -1,4 +1,5 @@
 <template>
+
 	<view class="container">
 		<!-- 功能模块 -->
 		<view class="modules">
@@ -6,6 +7,10 @@
 				:class="{ active: activeModule === item.type }" @click="handleModuleClick(item.type)">
 				{{ item.name }}
 			</view>
+		</view>
+
+		<view v-if="pendingOrder" class="pending-notice" @click="handlePendingOrderClick">
+			<text>您有正在处理中的<text class="order-type">{{ getOrderTypeName(pendingOrderType) }}</text>工单，点击查看详情</text>
 		</view>
 
 		<!-- 数据列表 -->
@@ -29,17 +34,16 @@
 		baseConfig
 	} from '../../utils/config';
 
-
 	export default {
 		data() {
 			return {
 				modules: [{
 						name: '维修',
 						type: 'repair',
-						url: `${baseConfig.baseUrl}/engineer/fail/getFail`, // 维修模块接口
-						method: 'GET', // 请求方式
-						detailUrl: `${baseConfig.baseUrl}/engineer/fail/getById`, // 维修详情接口
-						detailPage: '/pages/fail/fail' // 维修详情页面路径
+						url: `${baseConfig.baseUrl}/engineer/fail/getFail`,
+						method: 'GET',
+						detailUrl: `${baseConfig.baseUrl}/engineer/fail/getById`,
+						detailPage: '/pages/fail/fail'
 					},
 					{
 						name: '巡检',
@@ -47,7 +51,7 @@
 						url: `${baseConfig.baseUrl}/engineer/rtestOrder/getRTestOrder`,
 						method: 'GET',
 						detailUrl: `${baseConfig.baseUrl}/engineer/rtestOrder/getById`,
-						detailPage: '/pages/rtestOrder/rtestOrder' // 巡检详情页面路径
+						detailPage: '/pages/rtestOrder/rtestOrder'
 					},
 					{
 						name: '保养',
@@ -55,45 +59,116 @@
 						url: `${baseConfig.baseUrl}/engineer/baoyangOrder/getBaoyangOrder`,
 						method: 'GET',
 						detailUrl: `${baseConfig.baseUrl}/engineer/baoyangOrder/getById`,
-						detailPage: '/pages/baoyangOrder/baoyangOrder' // 保养详情页面路径
+						detailPage: '/pages/baoyangOrder/baoyangOrder'
 					},
 					{
 						name: '检测',
 						type: 'test',
 						url: `${baseConfig.baseUrl}/engineer/testOrder/getTestOrder`,
 						method: 'GET',
-						detailUrl: `${baseConfig.baseUrl}/engineer/testOrder/getById`, // 检测详情接口
-						detailPage: '/pages/testOrder/testOrder' // 检测详情页面路径
+						detailUrl: `${baseConfig.baseUrl}/engineer/testOrder/getById`,
+						detailPage: '/pages/testOrder/testOrder'
 					}
 				],
+				pendingOrder: false,
+				pendingOrderType: null,
+				pendingOrderId: null,
 				activeModule: 'repair',
-				listData: [], // 存储列表数据
+				listData: [],
 				token: '',
-				deviceOptions: []
+				deviceOptions: [],
+				searchKeyword: ''
 			};
 		},
 		mounted() {
 			this.getAccessToken();
+			this.checkPendingOrder();
 			this.fetchData();
 			this.getDeviceOptions();
 		},
 		onPullDownRefresh() {
-			// 调用获取数据的方法
-			this.fetchData().then(() => {
-				// 数据获取完成后停止下拉刷新动画
-				uni.stopPullDownRefresh();
-			});
+			// 同时刷新数据列表和待处理工单状态
+			Promise.all([this.fetchData(), this.checkPendingOrder()])
+				.finally(() => {
+					uni.stopPullDownRefresh();
+				});
 		},
 		methods: {
+			getOrderTypeName(type) {
+				const typeMap = {
+					'repair': '维修',
+					'inspection': '巡检',
+					'maintenance': '保养',
+					'test': '检测'
+				};
+				return typeMap[type] || '未知';
+			},
+			async checkPendingOrder() {
+				try {
+					const {
+						data
+					} = await uni.request({
+						url: `${baseConfig.baseUrl}/engineer/fail/test`,
+						method: 'POST',
+						header: {
+							'Authorization': `Bearer ${this.token}`
+						}
+					});
+
+					if (data.code === 200 && data.data) {
+						this.pendingOrder = true;
+						this.pendingOrderType = data.data.type;
+						this.pendingOrderId = data.data.id;
+					} else {
+						this.pendingOrder = false;
+						this.pendingOrderType = null;
+						this.pendingOrderId = null;
+					}
+				} catch (error) {
+					console.error('工单检查失败:', error);
+					this.pendingOrder = false;
+				}
+			},
+
+			async handlePendingOrderClick() {
+				if (!this.pendingOrderType || !this.pendingOrderId) return;
+
+				const currentModule = this.modules.find(item => item.type === this.pendingOrderType);
+				if (currentModule) {
+					const detailUrl = `${currentModule.detailUrl}/${this.pendingOrderId}`;
+					const res = await uni.request({
+						url: detailUrl,
+						method: 'GET',
+						header: {
+							'Authorization': `Bearer ${this.token}`
+						}
+					});
+
+					if (res.data.code === 200) {
+						const detailData = res.data.data;
+						const encodedData = encodeURIComponent(JSON.stringify(detailData));
+						uni.navigateTo({
+							url: `${currentModule.detailPage}?detailData=${encodedData}`
+						});
+					} else {
+						uni.showToast({
+							title: '详情数据加载失败',
+							icon: 'none'
+						});
+					}
+				}
+			},
+
 			getAccessToken() {
 				this.token = uni.getStorageSync('token');
 			},
+
 			getDeviceOptions() {
 				uni.request({
 					url: `${baseConfig.baseUrl}/engineer/device/get`,
 					method: 'GET',
 					header: {
-						'Authorization': `Bearer ${this.token}` // ✅ 使用存储的 token
+						'Authorization': `Bearer ${this.token}`
 					},
 					success: (res) => {
 						if (res.data.code === 200) {
@@ -101,18 +176,18 @@
 								id: device.id,
 								name: device.name
 							}));
-							// 数据获取后更新列表数据中的设备名称
-							this.updateListDataDeviceNames();
+							if (this.listData.length > 0) {
+								this.updateListDataDeviceNames();
+							}
 						}
 					}
 				});
 			},
-			// 获取当前模块配置
+
 			getCurrentModule() {
 				return this.modules.find(item => item.type === this.activeModule);
 			},
 
-			// 获取数据（修改后）
 			async fetchData() {
 				try {
 					const currentModule = this.getCurrentModule();
@@ -121,35 +196,25 @@
 					const requestConfig = {
 						url: currentModule.url,
 						method: currentModule.method,
-						data: {}
+						header: {
+							'Authorization': `Bearer ${this.token}`
+						}
 					};
 
-					// 根据请求方式组织参数
 					if (currentModule.method === 'GET') {
 						requestConfig.data = {
-							moduleType: this.activeModule,
 							keyword: this.searchKeyword
 						};
-						requestConfig.header = {
-							'Authorization': `Bearer ${this.token}`
-						};
-					} else { // POST请求
-						requestConfig.header = {
-							'Authorization': `Bearer ${this.token}`
-						};
+					} else {
 						requestConfig.data = {
-							queryParams: {
-								keyword: this.searchKeyword
-							}
+							keyword: this.searchKeyword
 						};
-						requestConfig.data = JSON.stringify(requestConfig.data);
 					}
 
 					const res = await uni.request(requestConfig);
 
 					if (res.statusCode === 200) {
 						this.listData = res.data.data;
-						// 数据获取后更新列表数据中的设备名称
 						this.updateListDataDeviceNames();
 					}
 				} catch (error) {
@@ -159,11 +224,12 @@
 					});
 				}
 			},
+
 			handleModuleClick(type) {
 				this.activeModule = type;
 				this.fetchData();
 			},
-			// 状态处理方法
+
 			getStatusClass(status) {
 				switch (status) {
 					case 0:
@@ -193,10 +259,12 @@
 						return '';
 				}
 			},
+
 			getDeviceName(deviceId) {
-				const device = this.deviceOptions.find(item => item.id === deviceId);
-				return device ? device.name : '未知设备';
+				if (!deviceId) return '未绑定设备';
+				return this.deviceOptions.find(item => item.id === deviceId)?.name || '未知设备';
 			},
+
 			updateListDataDeviceNames() {
 				this.listData = this.listData.map(item => {
 					return {
@@ -205,11 +273,12 @@
 					};
 				});
 			},
+
 			async handleItemClick(item) {
 				const currentModule = this.getCurrentModule();
 				if (!currentModule) return;
 
-				const detailUrl = `${currentModule.detailUrl}/${item.id}`; // 确保URL格式正确
+				const detailUrl = `${currentModule.detailUrl}/${item.id}`;
 				const res = await uni.request({
 					url: detailUrl,
 					method: 'GET',
@@ -218,10 +287,8 @@
 					}
 				});
 
-				// 检查HTTP状态码和业务状态码
 				if (res.data.code === 200) {
 					const detailData = res.data.data;
-					// 编码参数
 					const encodedData = encodeURIComponent(JSON.stringify(detailData));
 					uni.navigateTo({
 						url: `${currentModule.detailPage}?detailData=${encodedData}`
@@ -238,6 +305,38 @@
 </script>
 
 <style scoped>
+	.order-type {
+		color: #007AFF;
+		font-weight: bold;
+		margin: 0 4rpx;
+	}
+
+	.pending-notice {
+		background: #fffbe6;
+		border: 1px solid #ffe58f;
+		border-radius: 8rpx;
+		padding: 20rpx 30rpx;
+		margin: 0 20rpx 20rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 28rpx;
+		color: #d48806;
+		animation: fadeIn 0.3s;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
 	.item-content {
 		display: flex;
 		justify-content: space-between;
@@ -291,10 +390,6 @@
 
 	.container {
 		padding: 20rpx;
-	}
-
-	.search-bar {
-		margin-bottom: 30rpx;
 	}
 
 	.modules {

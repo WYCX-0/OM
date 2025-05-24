@@ -1,29 +1,33 @@
 
-	/* 增强地图容器样式 */
-.map-container[data-v-134de0b2] {
-		margin: 0.625rem;
-		height: 10.9375rem;
-		border-radius: 0.5rem;
-		overflow: hidden;
+.repair-image-container[data-v-134de0b2] {
+		width: 100%;
+		height: 100%;
 		position: relative;
+		cursor: pointer;
 }
-.map-container[data-v-134de0b2]::after {
-		content: '电子围栏区域';
+.overlay-text[data-v-134de0b2] {
+		font-size: 12px;
+}
+.image-overlay[data-v-134de0b2] {
 		position: absolute;
-		bottom: 0.3125rem;
-		right: 0.3125rem;
-		background: rgba(0, 0, 0, 0.6);
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.6);
 		color: white;
-		padding: 0.25rem 0.5rem;
-		border-radius: 0.25rem;
-		font-size: 0.75rem;
-}
-.countdown-container[data-v-134de0b2] {
-		padding: 0.625rem;
-		background-color: #fff;
-		border-radius: 0.3125rem;
-		margin: 0.625rem;
+		padding: 6px;
 		text-align: center;
+		opacity: 0;
+		transition: opacity 0.3s;
+		border-radius: 0 0 8px 8px;
+}
+.map-button-container[data-v-134de0b2] {
+		padding: 0.9375rem;
+}
+.map-button[data-v-134de0b2] {
+		background: #1890ff;
+		color: white;
+		border-radius: 1.5625rem;
 }
 .countdown-text[data-v-134de0b2] {
 		font-size: 1rem;
