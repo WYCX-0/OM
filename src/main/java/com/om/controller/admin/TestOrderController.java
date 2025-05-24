@@ -19,6 +19,16 @@ public class TestOrderController {
     private TestOrderService testOrderService;
 
     /**
+     * 获取测试订单
+     * @return
+     */
+    @GetMapping("/getById/{id}")
+    public Result<TestOrder> getById(@PathVariable Integer id) {
+        log.info("获取测试订单");
+        return Result.success(testOrderService.getById(id));
+    }
+
+    /**
      * 添加测试订单
      * @param testOrderAddDTO
      * @return

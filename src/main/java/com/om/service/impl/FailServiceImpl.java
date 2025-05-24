@@ -17,7 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -51,9 +54,7 @@ public class FailServiceImpl implements FailService {
 
         String message=fail1.getId()+","+engineer.getId();
         String role="admin";
-        long sid=BaseContext.getCurrentId();
-        String sid1=String.valueOf(sid);
-        webSocketServer.onMessage(message,role,sid1);
+        webSocketServer.onMessage(message,role);
     }
 
     /**
@@ -120,7 +121,7 @@ public class FailServiceImpl implements FailService {
         String role="engineer";
         long sid=BaseContext.getCurrentId();
         String sid1=String.valueOf(sid);
-        webSocketServer.onMessage(message,role,sid1);
+        webSocketServer.onMessage(message,role);
     }
 
     /**
@@ -144,6 +145,24 @@ public class FailServiceImpl implements FailService {
         fail.setEngineerId(currentId);
         Fail fail1=failMapper.getByStatus(fail);
         return fail1;
+    }
+
+    /**
+     * 统计故障数量
+     * @return
+     */
+    @Override
+    public Map<Long, Integer> collect() {
+        List<Map<String, Object>> resultList = failMapper.collect();
+        Map<Long, Integer> deviceFaultMap = new LinkedHashMap<>(); // 使用LinkedHashMap保持排序
+
+        for (Map<String, Object> row : resultList) {
+            Long deviceId = ((Number) row.get("device_id")).longValue();
+            Integer faultCount = ((Number) row.get("fault_count")).intValue();
+            deviceFaultMap.put(deviceId, faultCount);
+        }
+
+        return deviceFaultMap;
     }
 
 }

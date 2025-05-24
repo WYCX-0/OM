@@ -4,10 +4,12 @@ import com.github.pagehelper.Page;
 import com.om.pojo.dto.TestOrderPageDTO;
 import com.om.pojo.entity.TestOrder;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface TestOrderMapper {
@@ -45,9 +47,21 @@ public interface TestOrderMapper {
      * @param engineerId
      * @return
      */
-    @Select("select * from test_order where engineer_id = #{engineerId}")
+    @Select("select * from test_order where engineer_id = #{engineerId} order by status asc")
     List<TestOrder> getTestOrder(long engineerId);
 
     @Select("select * from test_order where status = 2 and engineer_id=#{engineerId}")
     TestOrder getByStatus(long engineerId);
+
+    /**
+     * 统计工程师完成测试订单数量
+     * @return
+     */
+    @Select("SELECT e.id AS engineer_id, COALESCE(f.count, 0) AS fault_count " +
+            "FROM engineer e " +
+            "LEFT JOIN (SELECT engineer_id, COUNT(*) AS count FROM test_order GROUP BY engineer_id) f " +
+            "ON e.id = f.engineer_id " +
+            "ORDER BY fault_count DESC")
+    List<Map<String, Object>> summary();
+
 }

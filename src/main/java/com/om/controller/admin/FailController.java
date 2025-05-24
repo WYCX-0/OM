@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Slf4j
 @RestController("/adminFailController")
 @RequestMapping("/admin/fail")
@@ -18,17 +20,18 @@ public class FailController {
     @Autowired
     private FailService failService;
 
-    /**
-     * 添加故障
-     * @param failAdminDTO
-     * @return
-     */
-    @PostMapping("/add")
-    public Result<String> add(@RequestBody FailAddDTO failAdminDTO){
-        log.info("添加故障: {}", failAdminDTO);
-        failService.add(failAdminDTO);
-        return Result.success();
-    }
+//    /**
+//     * 添加故障
+//     * @param failAdminDTO
+//     * @return
+//     */
+//    @PostMapping("/add")
+//    public Result<String> add(@RequestBody FailAddDTO failAdminDTO){
+//        log.info("添加故障: {}", failAdminDTO);
+//        failService.add(failAdminDTO);
+//        return Result.success();
+//    }
+
 
     /**
      * 删除故障
@@ -56,6 +59,17 @@ public class FailController {
         log.info("查询故障: {}", failPageDTO);
         PageResult pageResult=failService.list(failPageDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 获取故障
+     * @param id
+     * @return
+     */
+    @GetMapping("/getById/{id}")
+    public Result<Fail> getById(@PathVariable Integer id){
+        log.info("获取故障: {}", id);
+        return Result.success(failService.getById(id));
     }
 
 }

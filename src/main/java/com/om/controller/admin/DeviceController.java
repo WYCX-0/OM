@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
-@RestController
+@RestController("/adminDeviceController")
 @RequestMapping("/admin/device")
 public class DeviceController {
 
@@ -75,6 +75,17 @@ public class DeviceController {
         log.info("分页查询设备: {}", devicePageDTO);
         PageResult pageResult = deviceService.list(devicePageDTO);
         return Result.success(pageResult);
+    }
+
+    /**
+     * 只查询未删除的设备
+     * @return
+     */
+    @GetMapping("/zai")
+    public Result<List<Device>> zai(){
+        log.info("查询设备");
+        List<Device> devices = deviceService.zai();
+        return Result.success(devices);
     }
 
     /**

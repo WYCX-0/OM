@@ -1,10 +1,14 @@
 package com.om.controller.engineer;
 
 import com.om.context.BaseContext;
+import com.om.pojo.entity.BaoyangOrder;
 import com.om.pojo.entity.Fail;
+import com.om.pojo.entity.RTestOrder;
 import com.om.pojo.entity.TestOrder;
 import com.om.pojo.result.Result;
+import com.om.service.BaoyangOrderService;
 import com.om.service.FailService;
+import com.om.service.RTestOrderService;
 import com.om.service.TestOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +25,10 @@ public class TestOrderController {
     private TestOrderService testOrderService;
     @Autowired
     private FailService failService;
-
+    @Autowired
+    private RTestOrderService rtestOrderService;
+    @Autowired
+    private BaoyangOrderService baoyangOrderService;
     /**
      * 获取所有测试订单
      * @return
@@ -49,14 +56,14 @@ public class TestOrderController {
     @PostMapping("/deal/{id}")
     public Result<String> deal(@PathVariable Integer id) {
         log.info("查询是否有处理中的工单");
-        long currentId = BaseContext.getCurrentId();
-        Fail fail=failService.getByStatus(currentId);
-        if (fail!=null){
+
+        Fail fail=failService.getByStatus(BaseContext.getCurrentId());
+        TestOrder testOrder=testOrderService.getByStatus(BaseContext.getCurrentId());
+        RTestOrder rtestOrder=rtestOrderService.getByStatus(BaseContext.getCurrentId());
+        BaoyangOrder baoyangOrder=baoyangOrderService.getByStatus(BaseContext.getCurrentId());
+
+        if (fail!=null || testOrder!=null||rtestOrder!=null||baoyangOrder!=null){
             return Result.error("该工程师有正在处理中的故障");
-        }
-        TestOrder testOrder=testOrderService.getByStatus(currentId);
-        if(testOrder!=null){
-            return Result.error("该工程师有正在处理中的工单");
         }
         log.info("处理测试订单: {}", id);
         testOrderService.deal(id);

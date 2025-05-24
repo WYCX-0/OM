@@ -53,4 +53,10 @@ public interface DeviceService {
      * @return
      */
     Device get4ById(Integer id);
+
+    /**
+     * 只查询未删除的设备
+     * @return
+     */
+    List<Device> zai();
 }

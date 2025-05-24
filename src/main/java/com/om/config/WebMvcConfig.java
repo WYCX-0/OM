@@ -19,29 +19,29 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Autowired
     private JwtAdmin jwtAdmin;
 
-    /**
-     * 修正拦截器注册逻辑
-     */
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-        log.info("注册用户端拦截器...");
+        log.info("注册工程师端拦截器...");
         registry.addInterceptor(jwtEngineer)
                 .addPathPatterns("/engineer/**")
-                .excludePathPatterns(
-                        "/engineer/login"
-                );
+                .excludePathPatterns("/engineer/login","/upload/**");
 
         log.info("注册管理端拦截器...");
         registry.addInterceptor(jwtAdmin)
                 .addPathPatterns("/admin/**")
-                .excludePathPatterns("/admin/login","/**");
+                .excludePathPatterns("/admin/login","/upload/**");
 
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/**")
-                .addResourceLocations("file:src/main/resources/static/");
-    }
+        // 处理上传文件的静态资源映射
+        registry.addResourceHandler("/upload/**")
+                .addResourceLocations("classpath:/static/upload/");
 
+        // 保留默认静态资源处理
+        registry.addResourceHandler("/**")
+                .addResourceLocations("classpath:/static/");
+
+    }
 }

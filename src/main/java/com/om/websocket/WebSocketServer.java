@@ -39,9 +39,9 @@ public class WebSocketServer {
      * 类似与controller
      */
     @OnMessage
-    public void onMessage(String message, @PathParam("role") String role, @PathParam("sid") String sid) {
+    public void onMessage(String message, @PathParam("role") String role) {
         if ("admin".equals(role)) {
-            System.out.println("管理端" + sid + "发送消息:" + message);
+            System.out.println("管理端"+ "发送消息:" + message);
             String[] parts = message.split(",");
             if (parts.length == 2) {
                 String orderId = parts[0];
@@ -50,7 +50,7 @@ public class WebSocketServer {
             }
 
         } else if ("engineer".equals(role)) {
-            System.out.println("工程师端" + sid + "发送消息  " + message);
+            System.out.println("工程师端发送消息  " + message);
             String[] parts = message.split(",");
             if (parts.length == 2) {
                 String orderId = parts[0];

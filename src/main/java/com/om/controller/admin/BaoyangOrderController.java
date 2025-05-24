@@ -27,6 +27,16 @@ public class BaoyangOrderController {
     private BaoyangOrderService baoyangOrderService;
 
     /**
+     * 获取测试订单
+     * @return
+     */
+    @GetMapping("/getById/{id}")
+    public Result<BaoyangOrder> getById(@PathVariable Integer id) {
+        log.info("获取测试订单");
+        return Result.success( baoyangOrderService.getById(id));
+    }
+
+    /**
      * 添加测试订单
      * @param baoyangOrderAddDTO
      * @return

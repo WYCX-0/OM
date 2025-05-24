@@ -24,6 +24,16 @@ public class RTestOrderController {
     private RTestOrderService rtestOrderService;
 
     /**
+     * 获取巡检订单
+     * @return
+     */
+    @GetMapping("/getById/{id}")
+    public Result<RTestOrder> getById(@PathVariable Integer id) {
+        log.info("获取巡检订单");
+        return Result.success(rtestOrderService.getById(id));
+    }
+
+    /**
      * 添加测试订单
      * @param rtestOrderAddDTO
      * @return

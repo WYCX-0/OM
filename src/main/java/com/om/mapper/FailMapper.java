@@ -4,10 +4,12 @@ import com.github.pagehelper.Page;
 import com.om.pojo.dto.FailPageDTO;
 import com.om.pojo.entity.Fail;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface FailMapper {
@@ -45,7 +47,7 @@ public interface FailMapper {
      * @param engineerId
      * @return
      */
-    @Select("select * from fail where engineer_id = #{engineerId}")
+    @Select("select * from fail where engineer_id = #{engineerId} order by status asc")
     List<Fail> getFail(long engineerId);
 
     /**
@@ -63,4 +65,27 @@ public interface FailMapper {
      */
     @Select("select * from fail where status =#{status} and engineer_id=#{engineerId} ")
     Fail getByStatus(Fail fail);
+
+    /**
+     * 获取故障信息列表
+     * @return
+     */
+    @Select("SELECT d.id AS device_id, COALESCE(f.count, 0) AS fault_count " +
+            "FROM device d " +
+            "LEFT JOIN (SELECT device_id, COUNT(*) AS count FROM fail GROUP BY device_id) f " +
+            "ON d.id = f.device_id " +
+            "ORDER BY fault_count DESC")
+    List<Map<String, Object>> collect();
+
+    /**
+     * 统计每个工程师的故障数量
+     * @return
+     */
+    @Select("SELECT e.id AS engineer_id, COALESCE(f.count, 0) AS fault_count " +
+            "FROM engineer e " +
+            "LEFT JOIN (SELECT engineer_id, COUNT(*) AS count FROM fail GROUP BY engineer_id) f " +
+            "ON e.id = f.engineer_id " +
+            "ORDER BY fault_count DESC")
+    List<Map<String, Object>> summary();
+
 }

@@ -30,7 +30,7 @@ public class RTestPlanTask {
     /**
      * 定时任务
      */
-    @Scheduled(cron = "0 52 20 * * *")
+    @Scheduled(cron = "0 23 16 * * *")
     public void Schedule(){
         log.info("定时任务开始");
         List<RTestPlan> rtestPlans = rtestPlanMapper.findPlansToNext(LocalDateTime.now());

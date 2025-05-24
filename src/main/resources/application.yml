@@ -22,7 +22,7 @@ om:
   jwt:
     admin-secret-key: admin
     engineer-secret-key: engineer
-    admin-ttl: 7200000
-    engineer-ttl: 7200000
+    admin-ttl: 43200000
+    engineer-ttl: 43200000
     admin-token-name: Authorization
     engineer-token-name: Authorization

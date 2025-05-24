@@ -24,7 +24,7 @@ public class TestPlanTask {
     /**
      * 定时任务
      */
-    @Scheduled(cron = "0 52 20 * * *")
+    @Scheduled(cron = "0 26 16 * * *")
     public void Schedule(){
         log.info("定时任务开始");
         List<TestPlan> testPlans = testPlanMapper.findPlansToNext(LocalDateTime.now());

@@ -65,6 +65,16 @@ public class DeviceServiceImpl implements DeviceService {
         return deviceMapper.get();
     }
 
+
+    /**
+     * 只查询未删除的设备
+     * @return
+     */
+    @Override
+    public List<Device> zai() {
+        return deviceMapper.zai();
+    }
+
     /**
      * 只查询消防设备
      * @return
@@ -93,4 +103,6 @@ public class DeviceServiceImpl implements DeviceService {
     public Device get4ById(Integer id) {
         return deviceMapper.get4ById(id);
     }
+
+
 }

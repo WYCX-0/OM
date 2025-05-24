@@ -59,4 +59,11 @@ public interface DeviceMapper {
      */
     @Select("select * from device where id=#{id}")
     Device get4ById(Integer id);
+
+    /**
+     * 查询在用的设备
+     * @return
+     */
+    @Select("select * from device where status=1")
+    List<Device> zai();
 }

@@ -56,7 +56,7 @@ public class RTestOrderServiceImpl implements RTestOrderService {
         String message=rtestOrder.getId()+","+engineer.getId();
         String role="admin";
         String sid1="1";
-        webSocketServer.onMessage(message,role,sid1);
+        webSocketServer.onMessage(message,role);
     }
 
     /**
@@ -144,8 +144,6 @@ public class RTestOrderServiceImpl implements RTestOrderService {
 
         String message=rtestOrder.getId()+","+rtestOrder.getEngineerId();
         String role="engineer";
-        long sid=BaseContext.getCurrentId();
-        String sid1=String.valueOf(sid);
-        webSocketServer.onMessage(message,role,sid1);
+        webSocketServer.onMessage(message,role);
     }
 }

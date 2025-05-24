@@ -6,6 +6,7 @@ import com.om.pojo.entity.Fail;
 import com.om.pojo.result.PageResult;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FailService {
 
@@ -58,4 +59,10 @@ public interface FailService {
      * @param currentId
      */
     Fail getByStatus(Long currentId);
+
+    /**
+     * 获取收藏
+     * @return
+     */
+    Map<Long, Integer> collect();
 }
