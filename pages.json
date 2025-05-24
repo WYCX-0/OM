@@ -1,0 +1,15 @@
+{
+	"pages": [{
+		"path": "pages/fail/fail",
+		"style": {
+			"navigationBarTitleText": ""
+		}
+	}],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"uniIdRouter": {}
+}
