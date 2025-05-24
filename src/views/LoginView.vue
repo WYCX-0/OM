@@ -57,7 +57,7 @@ export default {
               const token = res.data.token; // 假设 token 在 res.data.token 中
 
               // 创建 WebSocket 实例并连接，传递 $globalDialog 实例
-              const socketUrl = `ws://192.168.72.195:9090/ws/admin/${res.data.id}`; // 替换为实际的 WebSocket 地址
+              const socketUrl = `ws://192.168.103.195:9090/ws/admin/${res.data.id}`; // 替换为实际的 WebSocket 地址
               const webSocketService = new WebSocketService(socketUrl, token);
               webSocketService.connect();
 

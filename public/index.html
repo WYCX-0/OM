@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <script>
+      window._AMapSecurityConfig = {
+        securityJsCode: 'b0a92dde53c9d14331dd94ed8af6634d' // 替换为实际安全密钥
+      };
+    </script>
   </head>
   <body>
     <noscript>

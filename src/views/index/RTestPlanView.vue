@@ -65,7 +65,7 @@
                 <!-- 只读 -->
                 <el-form-item label="设备" prop="deviceId">
                     <el-select v-model="form.deviceId" placeholder="请选择设备" :disabled="dialogType === 'edit'">
-                        <el-option v-for="device in deviceOptions" :key="device.id" :label="device.name" :value="device.id"></el-option>
+                        <el-option v-for="device in zai" :key="device.id" :label="device.name" :value="device.id"></el-option>
                     </el-select>
                 </el-form-item>
 
@@ -114,6 +114,7 @@ export default {
                 pageSize: 10,
                 total: 0
             },
+            zai:[],
             // 对话框标题
             dialogTitle: "",
             // 对话框是否可见
@@ -145,9 +146,24 @@ export default {
         if (this.token) {
             this.fetchData();
             this.getDeviceOptions();
+            this.getZai();
         }
     },
     methods: {
+        getZai(){
+      request.get('/admin/device/zai', {
+        headers: {
+          'Authorization': `Bearer ${this.token}`
+        }
+      }).then(res => {
+        if (res.code === 200) {
+          this.zai = res.data.map(device => ( {
+            id: device.id,
+            name: device.name
+          }));
+        }
+      });
+    },
         getToken() {
             const user = JSON.parse(localStorage.getItem('user0'));
             if (user && user.token) {

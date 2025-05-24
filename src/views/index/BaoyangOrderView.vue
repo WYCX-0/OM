@@ -50,7 +50,7 @@
         </el-table-column>
         <el-table-column label="操作" width="180">
           <template slot-scope="scope">
-            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">
+            <el-button size="mini" type="primary" @click="handleView(scope.row.id)">
               查看
             </el-button>
             <el-button size="mini" type="danger" @click="handleResign(scope.row.id)"
@@ -74,7 +74,7 @@
       <el-form ref="form" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="保养设备" prop="deviceId">
           <el-select v-model="form.deviceId" placeholder="请选择保养设备">
-            <el-option v-for="device in deviceOptions" :key="device.id" :label="device.name"
+            <el-option v-for="device in zai" :key="device.id" :label="device.name"
                        :value="device.id"></el-option>
           </el-select>
         </el-form-item>
@@ -104,6 +104,7 @@ export default {
         engineerId: "",
         deviceId: ""
       },
+      zai:[],
       engineerOptions: [],
       deviceOptions: [],
       tableData: [],
@@ -137,9 +138,27 @@ export default {
       this.fetchData();
       this.getEngineerOptions();
       this.getDeviceOptions();
+      this.getZai();
     }
   },
   methods: {
+    getZai(){
+      request.get('/admin/device/zai', {
+        headers: {
+          'Authorization': `Bearer ${this.token}`
+        }
+      }).then(res => {
+        if (res.code === 200) {
+          this.zai = res.data.map(device => ( {
+            id: device.id,
+            name: device.name
+          }));
+        }
+      });
+    },
+    handleView(id) {
+            this.$router.push(`/index/baoyangDetail/${id}`); // 跳转详情页
+        },
     getToken() {
       const user = JSON.parse(localStorage.getItem('user0'));
       if (user && user.token) {

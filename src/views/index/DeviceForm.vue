@@ -1,7 +1,21 @@
 <template>
     <div class="main-container">
         <!-- 地图容器 -->
-        <div id="map-container" style="height: 600px; width: 100%"></div>
+        <div id="map-container" class="map-container"></div>
+
+        <!-- 搜索面板 -->
+        <div id="myPageTop" class="search-panel">
+            <label>请输入关键字</label>
+            <el-input 
+                v-model="searchKey" 
+                placeholder="请输入搜索关键字"
+                @keyup.enter.native="onSearch"
+                ref="searchInput">
+                <template #append>
+                    <el-button @click="onSearch">搜索</el-button>
+                </template>
+            </el-input>
+        </div>
 
         <!-- 设备控制面板 -->
         <div class="control-panel">
@@ -68,8 +82,12 @@ export default {
             // 地图相关
             map: null,
             circle: null,
+            marker: null,
             AMap: null,
-
+            autoComplete: null,
+            placeSearch: null,
+            searchKey: '',
+            
             // 表单相关
             deviceForm: {
                 id: null,
@@ -120,7 +138,7 @@ export default {
                 const AMap = await AMapLoader.load({
                     key: '90229722c579e3a198cfbc0382c10794',
                     version: '2.0',
-                    plugins: ['AMap.ToolBar', 'AMap.Scale']
+                    plugins: ['AMap.ToolBar', 'AMap.Scale', 'AMap.PlaceSearch', 'AMap.AutoComplete']
                 });
 
                 this.AMap = AMap;
@@ -134,6 +152,9 @@ export default {
                 this.map.addControl(new AMap.ToolBar());
                 this.map.addControl(new AMap.Scale());
 
+                // 初始化搜索插件
+                this.initSearchPlugins();
+                
                 // 绑定点击事件
                 this.map.on('click', this.handleMapClick);
             } catch (error) {
@@ -141,9 +162,113 @@ export default {
                 this.$message.error('地图加载失败，请检查网络连接');
             }
         },
+        
+        // 初始化搜索插件
+        initSearchPlugins() {
+            // 初始化自动完成
+            this.autoComplete = new this.AMap.AutoComplete({
+                input: this.$refs.searchInput.$el.querySelector('input')
+            });
+            
+            // 初始化地点搜索
+            this.placeSearch = new this.AMap.PlaceSearch({
+                map: this.map,
+                pageSize: 5,
+                pageIndex: 1,
+                city: '全国'
+            });
+            
+            // 注册自动完成选择事件
+            this.autoComplete.on('select', this.handleAutoCompleteSelect);
+        },
+        
+        // 处理自动完成选择
+        handleAutoCompleteSelect(e) {
+            this.searchKey = e.poi.name;
+            this.selectResult(e.poi);
+        },
+        
+        // 处理搜索
+        onSearch() {
+            if (!this.searchKey.trim()) {
+                this.$message.warning('请输入搜索关键字');
+                return;
+            }
+            
+            this.placeSearch.search(this.searchKey, (status, result) => {
+                if (status === 'complete' && result.info === 'OK') {
+                    if (result.poiList && result.poiList.pois && result.poiList.pois.length > 0) {
+                        this.selectResult(result.poiList.pois[0]);
+                    } else {
+                        this.$message.info('未找到相关结果');
+                    }
+                } else {
+                    this.$message.error('搜索失败，请重试');
+                    console.error('搜索错误:', status, result);
+                }
+            });
+        },
+        
+        // 选择搜索结果
+        selectResult(poi) {
+            this.clearExistingMarkers();
+            
+            // 添加标记
+            this.marker = new this.AMap.Marker({
+                position: [poi.location.lng, poi.location.lat],
+                title: poi.name,
+                draggable: true,
+                cursor: 'move',
+                raiseOnDrag: true
+            });
+            
+            // 添加信息窗口
+            const infoWindow = new this.AMap.InfoWindow({
+                content: `<div class="info-window">
+                            <div class="info-title">${poi.name}</div>
+                            <div class="info-address">地址: ${poi.district}${poi.address}</div>
+                         </div>`,
+                offset: new this.AMap.Pixel(0, -30)
+            });
+            
+            // 绑定标记事件
+            this.marker.on('click', () => {
+                infoWindow.open(this.map, this.marker.getPosition());
+            });
+            
+            this.marker.on('dragend', (e) => {
+                this.updateCoordinatesFromMarker(e.target.getPosition());
+            });
+            
+            this.map.add(this.marker);
+            this.map.setFitView([this.marker]);
+            
+            // 更新表单数据
+            this.deviceForm.centerLng = poi.location.lng.toFixed(6);
+            this.deviceForm.centerLat = poi.location.lat.toFixed(6);
+            this.deviceForm.address = `${poi.district}${poi.address}`;
+            
+            // 清除圆形区域
+            this.clearExistingCircle();
+        },
+        
+        // 清除现有标记
+        clearExistingMarkers() {
+            if (this.marker) {
+                this.map.remove(this.marker);
+                this.marker = null;
+            }
+        },
+        
+        // 从标记更新坐标
+        updateCoordinatesFromMarker(position) {
+            this.deviceForm.centerLng = position.lng.toFixed(6);
+            this.deviceForm.centerLat = position.lat.toFixed(6);
+        },
 
         // 地图点击处理
         handleMapClick(e) {
+            this.clearExistingMarkers();
             this.clearExistingCircle();
 
             this.circle = new this.AMap.Circle({
@@ -243,7 +368,6 @@ export default {
         // 重置表单
         resetForm() {
             this.$refs.deviceForm.resetFields();
-            this.deviceForm.fenceId = null;
             this.deviceForm = {
                 id: null,
                 type: '',
@@ -254,6 +378,8 @@ export default {
                 radius: 100
             };
             this.clearExistingCircle();
+            this.clearExistingMarkers();
+            this.searchKey = '';
         },
 
         // 清除地图元素
@@ -282,7 +408,7 @@ export default {
     width: 100%;
 }
 
-#map-container {
+.map-container {
     height: 100%;
     width: 100%;
 }
@@ -298,6 +424,18 @@ export default {
     z-index: 1000;
 }
 
+.search-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 300px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 10px;
+}
+
 .coordinates {
     display: flex;
     justify-content: space-between;
@@ -308,5 +446,21 @@ export default {
     display: flex;
     justify-content: flex-end;
     margin-top: 24px;
+}
+
+/* 信息窗口样式 */
+.info-window {
+    padding: 10px;
+    min-width: 200px;
+}
+
+.info-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.info-address {
+    color: #666;
+    font-size: 12px;
 }
 </style>    

@@ -28,10 +28,14 @@ const routes = [
       { path: 'inspection-plan', name: 'RTestPlanView', component: () => import('../views/index/RTestPlanView.vue') },
       { path: 'inspection-order', name: 'RTestOrderView', component: () => import('../views/index/RTestOrderView.vue') },
       { path: 'maintenance-plan', name: 'Maintenance-Plan', component: () => import('../views/index/BaoyangPlanView.vue') },
-      { path: 'maintenance-order', name: 'Maintenance-Order', component: () => import('../views/index/BaoyangOrderView.vue') },
-
+      {path:'maintenance-order',name:'Maintenance-Order',component:()=>import('../views/index/BaoyangOrderView.vue')},
+      {path:'test-order',name:'Test-Order',component:()=>import('../views/index/TestOrderView.vue')},
       {path:'spare',name:'Spare',component:()=>import('../views/index/SpareView.vue')},
-      { path: 'device-form/:dialogType', name: 'DeviceForm', component: () => import('../views/index/DeviceForm.vue'), props: true }
+      { path: 'device-form/:dialogType', name: 'DeviceForm', component: () => import('../views/index/DeviceForm.vue'), props: true },
+      { path: 'failDetail/:id', name: 'FailDetail', component: () => import('../views/index/FailDetail.vue') },
+      {path:'testDetail/:id',name:'TestDetail',component:()=>import('../views/index/TestDetail.vue')},
+      {path:'rtestDetail/:id',name:'RTestDetail',component:()=>import('../views/index/RTestDetail.vue')},
+      {path:'baoyangDetail/:id',name:'BaoyangDetail',component:()=>import('../views/index/BaoyangDetail.vue')},
    
     ]
   }

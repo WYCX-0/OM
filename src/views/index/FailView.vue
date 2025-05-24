@@ -37,7 +37,8 @@
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
                 <el-table-column label="报修前图片" width="120">
                     <template slot-scope="scope">
-                        <img :src="'http://localhost:9090' + scope.row.beforeUrl" alt="报修前图片" style="width: 100px; height: 80px; object-fit: cover;">
+                        <img :src="'http://localhost:9090' + scope.row.beforeUrl" alt="报修前图片"
+                            style="width: 100px; height: 80px; object-fit: cover;">
                     </template>
                 </el-table-column>
                 <el-table-column prop="detail" label="报修细节" width="110"></el-table-column>
@@ -58,7 +59,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="180">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="primary" @click="handleEdit(scope.row)">
+                        <el-button size="mini" type="primary" @click="handleView(scope.row.id)">
                             查看
                         </el-button>
                         <el-button size="mini" type="danger" @click="handleResign(scope.row.id)"
@@ -94,8 +95,8 @@
                 <!-- 上传图片 -->
                 <el-form-item label="请上传故障图片">
                     <div>
-                        <el-upload class="avatar-uploader" action="http://localhost:9090/upload"
-                            :show-file-list="false" :on-success="handleAvatarSuccess" :on-error="handleUploadError">
+                        <el-upload class="avatar-uploader" action="http://localhost:9090/upload" :show-file-list="false"
+                            :on-success="handleAvatarSuccess" :on-error="handleUploadError">
                             <img v-if="form.beforeUrl" :src="'http://localhost:9090' + form.beforeUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
@@ -161,6 +162,9 @@ export default {
         }
     },
     methods: {
+        handleView(id) {
+            this.$router.push(`/index/failDetail/${id}`); // 跳转详情页
+        },
         getToken() {
             const user = JSON.parse(localStorage.getItem('user0'));
             if (user && user.token) {
@@ -243,12 +247,16 @@ export default {
             });
         },
 
-        handleAvatarSuccess(res) {
-            this.form.beforeUrl = res.data;
+        handleAvatarSuccess(response) {
+            if (response.code === 200) {
+                this.form.beforeUrl = response.data;
+                this.$message.success("上传成功");
+            } else {
+                this.$message.error(response.msg || "上传失败");
+            }
         },
-
         handleUploadError() {
-            this.$message.error("上传失败，请重试");
+            this.$message.error("上传失败");
         },
 
         handleSubmit() {
@@ -323,7 +331,7 @@ export default {
             this.fetchData();
         },
         //格式化日期
-        formatDate(date){
+        formatDate(date) {
             return moment(date).format('YYYY-MM-DD HH:mm:ss');
         }
     }
@@ -332,9 +340,10 @@ export default {
 
 <style scoped>
 .pagination {
-  text-align: right;
-  margin-top: 20px;
+    text-align: right;
+    margin-top: 20px;
 }
+
 .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
