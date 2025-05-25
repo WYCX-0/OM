@@ -1,6 +1,8 @@
 <template>
-
 	<view class="container">
+		<view class="float-button" @click="handleFloatButtonClick">
+			+
+		</view>
 		<!-- 功能模块 -->
 		<view class="modules">
 			<view v-for="(item, index) in modules" :key="index" class="module-item"
@@ -94,6 +96,11 @@
 				});
 		},
 		methods: {
+			handleFloatButtonClick() {
+				uni.navigateTo({
+					url: '/pages/my/my' // 修改为你的目标页面路径
+				});
+			},
 			getOrderTypeName(type) {
 				const typeMap = {
 					'repair': '维修',
@@ -305,6 +312,28 @@
 </script>
 
 <style scoped>
+	.float-button {
+		position: fixed;
+		right: 40rpx;
+		bottom: 100rpx;
+		width: 100rpx;
+		height: 100rpx;
+		background-color: #007AFF;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-size: 50rpx;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.3);
+		z-index: 999;
+		transition: transform 0.2s;
+	}
+
+	.float-button:active {
+		transform: scale(0.95);
+	}
+
 	.order-type {
 		color: #007AFF;
 		font-weight: bold;

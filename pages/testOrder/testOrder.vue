@@ -113,7 +113,7 @@
 				token: '',
 				current: '', // 新增变量用于存储单选框的值
 				// 新增数据项
-				countdown: 5, // 3分钟倒计时（单位：秒）
+				countdown: 0, // 3分钟倒计时（单位：秒）
 				timer: null, // 倒计时定时器
 				locationInterval: null, // 定位检查定时器
 				fenceCenter: null, // 围栏中心坐标 [lng, lat]
@@ -131,6 +131,7 @@
 				try {
 					this.getAccessToken();
 					this.detailData = JSON.parse(decodeURIComponent(options.detailData));
+					this.countdown = this.detailData.time || 3;
 					this.getDeviceOptions(); // 获取设备选项
 					this.getFenceInfo();
 					console.log(this.detailData);
@@ -148,6 +149,11 @@
 		},
 		onShow() {
 			this.getFenceInfo();
+			if (this.detailData.status === 2) {
+				this.countdown = this.detailData.time || 3;
+				this.getFenceInfo();
+				this.startLocationCheck();
+			}
 		},
 		onUnload() {
 			// 页面卸载时清理定时器
@@ -194,8 +200,6 @@
 								content: '您不在电子围栏范围内，请移步',
 								showCancel: false
 							});
-
-							speak.speak("您不在电子围栏范围内，请移步")
 							return;
 						}
 
@@ -228,7 +232,9 @@
 							// 4. 启动围栏检测
 							this.startLocationCheck();
 
-							speak.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效")
+							speak.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
+
+							this.countdown = this.detailData.time || 3;
 						} else if (requestResult.data.code === 0) {
 							// 根据后端返回的错误信息显示相应的弹框
 							const errorMessage = requestResult.data.msg;
@@ -401,7 +407,7 @@
 			},
 			// 重置倒计时
 			resetCountdown() {
-				this.countdown = 180;
+				this.countdown = this.detailData.time || 3;
 				if (this.timer) {
 					clearInterval(this.timer);
 					this.timer = null;

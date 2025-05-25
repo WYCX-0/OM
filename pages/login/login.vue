@@ -57,6 +57,8 @@
 								name: res.data.data.name
 							});
 							uni.setStorageSync('token', res.data.data.token);
+							uni.setStorageSync('id', res.data.data.id);
+							uni.setStorageSync('password', res.data.data.password);
 							console.log(res.data.data.token);
 							const wsURL = `${baseConfig.wsBaseUrl}/ws/engineer/${res.data.data.id}`;
 							websocketObj.connect(wsURL, res.data.data.token);

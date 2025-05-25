@@ -127,8 +127,8 @@ if (uni.restoreGlobal) {
     }, 5e3);
   }
   const baseConfig = {
-    baseUrl: "http://192.168.225.195:9090",
-    wsBaseUrl: "ws://192.168.225.195:9090"
+    baseUrl: "http://192.168.152.195:9090",
+    wsBaseUrl: "ws://192.168.152.195:9090"
   };
   const _export_sfc = (sfc, props) => {
     const target = sfc.__vccOpts || sfc;
@@ -137,7 +137,7 @@ if (uni.restoreGlobal) {
     }
     return target;
   };
-  const _sfc_main$8 = {
+  const _sfc_main$a = {
     data() {
       return {
         engineerNo: "",
@@ -167,7 +167,9 @@ if (uni.restoreGlobal) {
                 name: res.data.data.name
               });
               uni.setStorageSync("token", res.data.data.token);
-              formatAppLog("log", "at pages/login/login.vue:60", res.data.data.token);
+              uni.setStorageSync("id", res.data.data.id);
+              uni.setStorageSync("password", res.data.data.password);
+              formatAppLog("log", "at pages/login/login.vue:62", res.data.data.token);
               const wsURL = `${baseConfig.wsBaseUrl}/ws/engineer/${res.data.data.id}`;
               websocketObj.connect(wsURL, res.data.data.token);
               uni.showToast({
@@ -185,7 +187,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/login/login.vue:79", "登录请求失败", err);
+            formatAppLog("error", "at pages/login/login.vue:81", "登录请求失败", err);
             uni.showToast({
               title: "网络错误，请稍后重试",
               icon: "none"
@@ -195,7 +197,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$9(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "brand-container" }, [
         vue.createElementVNode("text", { class: "brand-text" }, "运"),
@@ -241,8 +243,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-e4e4508d"], ["__file", "D:/app/om-engineer/pages/login/login.vue"]]);
-  const _sfc_main$7 = {
+  const PagesLoginLogin = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["render", _sfc_render$9], ["__scopeId", "data-v-e4e4508d"], ["__file", "D:/app/om-engineer/pages/login/login.vue"]]);
+  const _sfc_main$9 = {
     data() {
       return {
         modules: [
@@ -301,6 +303,12 @@ if (uni.restoreGlobal) {
       });
     },
     methods: {
+      handleFloatButtonClick() {
+        uni.navigateTo({
+          url: "/pages/my/my"
+          // 修改为你的目标页面路径
+        });
+      },
       getOrderTypeName(type) {
         const typeMap = {
           "repair": "维修",
@@ -331,7 +339,7 @@ if (uni.restoreGlobal) {
             this.pendingOrderId = null;
           }
         } catch (error) {
-          formatAppLog("error", "at pages/index/index.vue:128", "工单检查失败:", error);
+          formatAppLog("error", "at pages/index/index.vue:135", "工单检查失败:", error);
           this.pendingOrder = false;
         }
       },
@@ -494,8 +502,12 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$8(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
+      vue.createElementVNode("view", {
+        class: "float-button",
+        onClick: _cache[0] || (_cache[0] = (...args) => $options.handleFloatButtonClick && $options.handleFloatButtonClick(...args))
+      }, " + "),
       vue.createCommentVNode(" 功能模块 "),
       vue.createElementVNode("view", { class: "modules" }, [
         (vue.openBlock(true), vue.createElementBlock(
@@ -515,7 +527,7 @@ if (uni.restoreGlobal) {
       $data.pendingOrder ? (vue.openBlock(), vue.createElementBlock("view", {
         key: 0,
         class: "pending-notice",
-        onClick: _cache[0] || (_cache[0] = (...args) => $options.handlePendingOrderClick && $options.handlePendingOrderClick(...args))
+        onClick: _cache[1] || (_cache[1] = (...args) => $options.handlePendingOrderClick && $options.handlePendingOrderClick(...args))
       }, [
         vue.createElementVNode("text", null, [
           vue.createTextVNode("您有正在处理中的"),
@@ -582,7 +594,7 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-1cf27b2a"], ["__file", "D:/app/om-engineer/pages/index/index.vue"]]);
+  const PagesIndexIndex = /* @__PURE__ */ _export_sfc(_sfc_main$9, [["render", _sfc_render$8], ["__scopeId", "data-v-1cf27b2a"], ["__file", "D:/app/om-engineer/pages/index/index.vue"]]);
   function speak(text) {
     const url = "https://tts.baidu.com/text2audio.mp3?tex=" + text + "&cuid=baike&amp&lan=ZH&amp&ctp=1&amp&pdt=301&amp&vol=100&amp&rate=32&amp&per=0&spd=10&pit=undefined";
     if (typeof Audio !== "undefined") {
@@ -618,7 +630,7 @@ if (uni.restoreGlobal) {
   const speak$1 = {
     speak
   };
-  const _sfc_main$6 = {
+  const _sfc_main$8 = {
     data() {
       return {
         detailData: {
@@ -634,7 +646,6 @@ if (uni.restoreGlobal) {
         deviceName: "",
         deviceOptions: [],
         token: ""
-        // 请确保在实际使用中正确获取和存储 token
       };
     },
     onLoad(options) {
@@ -893,7 +904,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$7(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createCommentVNode(" 设备名称 "),
       vue.createElementVNode("view", { class: "detail-card" }, [
@@ -1027,8 +1038,8 @@ if (uni.restoreGlobal) {
       ])) : vue.createCommentVNode("v-if", true)
     ]);
   }
-  const PagesFailFail = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-4cd3f726"], ["__file", "D:/app/om-engineer/pages/fail/fail.vue"]]);
-  const _sfc_main$5 = {
+  const PagesFailFail = /* @__PURE__ */ _export_sfc(_sfc_main$8, [["render", _sfc_render$7], ["__scopeId", "data-v-4cd3f726"], ["__file", "D:/app/om-engineer/pages/fail/fail.vue"]]);
+  const _sfc_main$7 = {
     data() {
       return {
         detailData: {
@@ -1046,7 +1057,7 @@ if (uni.restoreGlobal) {
         current: "",
         // 新增变量用于存储单选框的值
         // 新增数据项
-        countdown: 5,
+        countdown: 0,
         // 3分钟倒计时（单位：秒）
         timer: null,
         // 倒计时定时器
@@ -1068,11 +1079,12 @@ if (uni.restoreGlobal) {
         try {
           this.getAccessToken();
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
+          this.countdown = this.detailData.time || 3;
           this.getDeviceOptions();
           this.getFenceInfo();
-          formatAppLog("log", "at pages/testOrder/testOrder.vue:136", this.detailData);
+          formatAppLog("log", "at pages/testOrder/testOrder.vue:137", this.detailData);
         } catch (e) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:138", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:139", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -1085,6 +1097,11 @@ if (uni.restoreGlobal) {
     },
     onShow() {
       this.getFenceInfo();
+      if (this.detailData.status === 2) {
+        this.countdown = this.detailData.time || 3;
+        this.getFenceInfo();
+        this.startLocationCheck();
+      }
     },
     onUnload() {
       if (this.timer)
@@ -1129,7 +1146,6 @@ if (uni.restoreGlobal) {
                 content: "您不在电子围栏范围内，请移步",
                 showCancel: false
               });
-              speak$1.speak("您不在电子围栏范围内，请移步");
               return;
             }
             const requestResult = await new Promise((resolve, reject) => {
@@ -1156,6 +1172,7 @@ if (uni.restoreGlobal) {
               this.getFenceInfo();
               this.startLocationCheck();
               speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
+              this.countdown = this.detailData.time || 3;
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -1166,7 +1183,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:243", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:249", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -1259,7 +1276,7 @@ if (uni.restoreGlobal) {
             padding: [50, 50, 50, 50]
           });
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:342", "获取位置失败:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:348", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -1276,7 +1293,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:359", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:365", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -1316,7 +1333,7 @@ if (uni.restoreGlobal) {
       },
       // 重置倒计时
       resetCountdown() {
-        this.countdown = 180;
+        this.countdown = this.detailData.time || 3;
         if (this.timer) {
           clearInterval(this.timer);
           this.timer = null;
@@ -1376,7 +1393,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/testOrder/testOrder.vue:467", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/testOrder/testOrder.vue:473", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -1427,7 +1444,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/testOrder/testOrder.vue:517", "解析响应失败", e);
+                  formatAppLog("error", "at pages/testOrder/testOrder.vue:523", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -1435,7 +1452,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/testOrder/testOrder.vue:525", "上传失败", err);
+                formatAppLog("error", "at pages/testOrder/testOrder.vue:531", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -1460,12 +1477,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/testOrder/testOrder.vue:550", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/testOrder/testOrder.vue:556", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/testOrder/testOrder.vue:555", this.current);
+            formatAppLog("log", "at pages/testOrder/testOrder.vue:561", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/testOrder/finish/${this.detailData.id}`,
@@ -1512,7 +1529,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/testOrder/testOrder.vue:609", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/testOrder/testOrder.vue:615", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -1542,7 +1559,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/testOrder/testOrder.vue:638", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/testOrder/testOrder.vue:644", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -1588,14 +1605,14 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/testOrder/testOrder.vue:684", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/testOrder/testOrder.vue:690", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$6(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
         vue.createElementVNode("view", { class: "map-button-container" }, [
@@ -1752,8 +1769,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesTestOrderTestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-7e3f3e94"], ["__file", "D:/app/om-engineer/pages/testOrder/testOrder.vue"]]);
-  const _sfc_main$4 = {
+  const PagesTestOrderTestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$7, [["render", _sfc_render$6], ["__scopeId", "data-v-7e3f3e94"], ["__file", "D:/app/om-engineer/pages/testOrder/testOrder.vue"]]);
+  const _sfc_main$6 = {
     data() {
       return {
         form: {
@@ -1804,7 +1821,7 @@ if (uni.restoreGlobal) {
       }
     }
   };
-  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$5(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "form-card" }, [
         vue.createElementVNode("view", { class: "form-item" }, [
@@ -1832,8 +1849,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesSpareSpare = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-bd81fea5"], ["__file", "D:/app/om-engineer/pages/spare/spare.vue"]]);
-  const _sfc_main$3 = {
+  const PagesSpareSpare = /* @__PURE__ */ _export_sfc(_sfc_main$6, [["render", _sfc_render$5], ["__scopeId", "data-v-bd81fea5"], ["__file", "D:/app/om-engineer/pages/spare/spare.vue"]]);
+  const _sfc_main$5 = {
     data() {
       return {
         detailData: {
@@ -1851,7 +1868,7 @@ if (uni.restoreGlobal) {
         current: "",
         // 新增变量用于存储单选框的值
         // 新增数据项
-        countdown: 5,
+        countdown: 0,
         // 3分钟倒计时（单位：秒）
         timer: null,
         // 倒计时定时器
@@ -1873,11 +1890,12 @@ if (uni.restoreGlobal) {
         try {
           this.getAccessToken();
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
+          this.countdown = this.detailData.time || 3;
           this.getDeviceOptions();
           this.getFenceInfo();
-          formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:136", this.detailData);
+          formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:137", this.detailData);
         } catch (e) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:138", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:139", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -1890,6 +1908,11 @@ if (uni.restoreGlobal) {
     },
     onShow() {
       this.getFenceInfo();
+      if (this.detailData.status === 2) {
+        this.countdown = this.detailData.time || 3;
+        this.getFenceInfo();
+        this.startLocationCheck();
+      }
     },
     onUnload() {
       if (this.timer)
@@ -1959,7 +1982,8 @@ if (uni.restoreGlobal) {
               this.updateStatus(2);
               this.getFenceInfo();
               this.startLocationCheck();
-              speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
+              speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效，请不要退出该界面");
+              this.countdown = this.detailData.time || 3;
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -1970,7 +1994,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:241", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:248", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -2063,7 +2087,7 @@ if (uni.restoreGlobal) {
             padding: [50, 50, 50, 50]
           });
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:340", "获取位置失败:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:347", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -2080,7 +2104,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:357", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:364", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -2120,7 +2144,7 @@ if (uni.restoreGlobal) {
       },
       // 重置倒计时
       resetCountdown() {
-        this.countdown = 180;
+        this.countdown = this.detailData.time || 3;
         if (this.timer) {
           clearInterval(this.timer);
           this.timer = null;
@@ -2180,7 +2204,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:465", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:472", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -2231,7 +2255,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:515", "解析响应失败", e);
+                  formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:522", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -2239,7 +2263,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:523", "上传失败", err);
+                formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:530", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -2264,12 +2288,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:548", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:555", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:553", this.current);
+            formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:560", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/rtestOrder/finish/${this.detailData.id}`,
@@ -2316,7 +2340,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:607", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:614", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -2346,7 +2370,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:636", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/rtestOrder/rtestOrder.vue:643", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -2392,14 +2416,14 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:682", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/rtestOrder/rtestOrder.vue:689", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$4(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
         vue.createElementVNode("view", { class: "map-button-container" }, [
@@ -2556,8 +2580,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesRtestOrderRtestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__scopeId", "data-v-134de0b2"], ["__file", "D:/app/om-engineer/pages/rtestOrder/rtestOrder.vue"]]);
-  const _sfc_main$2 = {
+  const PagesRtestOrderRtestOrder = /* @__PURE__ */ _export_sfc(_sfc_main$5, [["render", _sfc_render$4], ["__scopeId", "data-v-134de0b2"], ["__file", "D:/app/om-engineer/pages/rtestOrder/rtestOrder.vue"]]);
+  const _sfc_main$4 = {
     data() {
       return {
         includePoints: [],
@@ -2576,7 +2600,7 @@ if (uni.restoreGlobal) {
         current: "",
         // 新增变量用于存储单选框的值
         // 新增数据项
-        countdown: 5,
+        countdown: 0,
         // 3分钟倒计时（单位：秒）
         timer: null,
         // 倒计时定时器
@@ -2598,10 +2622,11 @@ if (uni.restoreGlobal) {
         try {
           this.getAccessToken();
           this.detailData = JSON.parse(decodeURIComponent(options.detailData));
+          this.countdown = this.detailData.time || 3;
           this.getDeviceOptions();
           this.getFenceInfo();
         } catch (e) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:138", "解析详情数据失败", e);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:139", "解析详情数据失败", e);
           uni.showToast({
             title: "数据加载失败",
             icon: "none"
@@ -2614,6 +2639,11 @@ if (uni.restoreGlobal) {
     },
     onShow() {
       this.getFenceInfo();
+      if (this.detailData.status === 2) {
+        this.countdown = this.detailData.time || 3;
+        this.getFenceInfo();
+        this.startLocationCheck();
+      }
     },
     onUnload() {
       if (this.timer)
@@ -2682,7 +2712,6 @@ if (uni.restoreGlobal) {
                 content: "您不在电子围栏范围内，请移步",
                 showCancel: false
               });
-              speak$1.speak("您不在电子围栏范围内，请移步");
               return;
             }
             const requestResult = await new Promise((resolve, reject) => {
@@ -2709,6 +2738,7 @@ if (uni.restoreGlobal) {
               this.getFenceInfo();
               this.startLocationCheck();
               speak$1.speak("操作机械设备前，请检查设备状态，确保安全装置齐全有效");
+              this.countdown = this.detailData.time || 3;
             } else if (requestResult.data.code === 0) {
               const errorMessage = requestResult.data.msg;
               uni.showModal({
@@ -2719,7 +2749,7 @@ if (uni.restoreGlobal) {
             }
           }
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:271", "处理过程中出现错误:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:278", "处理过程中出现错误:", error);
           uni.showToast({
             title: "处理失败",
             icon: "none"
@@ -2791,7 +2821,7 @@ if (uni.restoreGlobal) {
         } : null;
         this.markers = [fenceMarker].concat(userMarker || []);
         this.circles = [fenceCircle];
-        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:349", "当前覆盖物：", {
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:356", "当前覆盖物：", {
           markers: this.markers,
           circles: this.circles
         });
@@ -2821,7 +2851,7 @@ if (uni.restoreGlobal) {
             });
           }
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:385", "获取位置失败:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:392", "获取位置失败:", error);
         }
       },
       // 定位检查方法
@@ -2838,7 +2868,7 @@ if (uni.restoreGlobal) {
           }
           this.updateUserPosition();
         } catch (error) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:402", "检查位置时出错:", error);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:409", "检查位置时出错:", error);
         }
       },
       // 检查是否在围栏内
@@ -2878,7 +2908,7 @@ if (uni.restoreGlobal) {
       },
       // 重置倒计时
       resetCountdown() {
-        this.countdown = 180;
+        this.countdown = this.detailData.time || 3;
         if (this.timer) {
           clearInterval(this.timer);
           this.timer = null;
@@ -2917,7 +2947,7 @@ if (uni.restoreGlobal) {
           try {
             await this.checkLocation();
           } catch (e) {
-            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:489", "周期定位检查失败:", e);
+            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:496", "周期定位检查失败:", e);
           }
         }, 5e3);
       },
@@ -2968,7 +2998,7 @@ if (uni.restoreGlobal) {
                     });
                   }
                 } catch (e) {
-                  formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:539", "解析响应失败", e);
+                  formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:546", "解析响应失败", e);
                   uni.showToast({
                     title: "上传结果解析失败",
                     icon: "none"
@@ -2976,7 +3006,7 @@ if (uni.restoreGlobal) {
                 }
               },
               fail: (err) => {
-                formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:547", "上传失败", err);
+                formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:554", "上传失败", err);
                 uni.showToast({
                   title: `上传失败: ${err.errMsg}`,
                   icon: "none"
@@ -3001,12 +3031,12 @@ if (uni.restoreGlobal) {
           });
           return;
         }
-        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:572", "finish:{}", this.finishUrl);
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:579", "finish:{}", this.finishUrl);
         uni.showModal({
           title: "确认完成",
           content: "确定已完成维修吗？",
           success: (res) => {
-            formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:577", this.current);
+            formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:584", this.current);
             if (res.confirm) {
               uni.request({
                 url: `${baseConfig.baseUrl}/engineer/baoyangOrder/finish/${this.detailData.id}`,
@@ -3053,7 +3083,7 @@ if (uni.restoreGlobal) {
             return "--";
           return `${year}-${padZero(month)}-${padZero(day)} ${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
         } catch (e) {
-          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:631", "日期格式化失败:", e);
+          formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:638", "日期格式化失败:", e);
           return "--";
         }
       },
@@ -3083,7 +3113,7 @@ if (uni.restoreGlobal) {
             }
           },
           fail: (err) => {
-            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:660", "获取设备列表失败", err);
+            formatAppLog("error", "at pages/baoyangOrder/baoyangOrder.vue:667", "获取设备列表失败", err);
             uni.showToast({
               title: "获取设备列表失败，请检查网络连接",
               icon: "none"
@@ -3129,14 +3159,14 @@ if (uni.restoreGlobal) {
       },
       updateStatus(newStatus) {
         this.detailData.status = newStatus;
-        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:706", "状态已更新为:", this.getStatusText(newStatus));
+        formatAppLog("log", "at pages/baoyangOrder/baoyangOrder.vue:713", "状态已更新为:", this.getStatusText(newStatus));
       },
       onRadioChange(e) {
         this.current = e.detail.value;
       }
     }
   };
-  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$3(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
       vue.createElementVNode("view", { class: "container" }, [
         vue.createElementVNode("view", { class: "map-button-container" }, [
@@ -3293,8 +3323,8 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesBaoyangOrderBaoyangOrder = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__scopeId", "data-v-6915bd98"], ["__file", "D:/app/om-engineer/pages/baoyangOrder/baoyangOrder.vue"]]);
-  const _sfc_main$1 = {
+  const PagesBaoyangOrderBaoyangOrder = /* @__PURE__ */ _export_sfc(_sfc_main$4, [["render", _sfc_render$3], ["__scopeId", "data-v-6915bd98"], ["__file", "D:/app/om-engineer/pages/baoyangOrder/baoyangOrder.vue"]]);
+  const _sfc_main$3 = {
     data() {
       return {
         centerLng: 116.397428,
@@ -3425,7 +3455,7 @@ if (uni.restoreGlobal) {
       this.mapCtx = null;
     }
   };
-  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+  function _sfc_render$2(_ctx, _cache, $props, $setup, $data, $options) {
     return vue.openBlock(), vue.createElementBlock("view", { class: "map-container" }, [
       vue.createCommentVNode(" 地图组件 "),
       vue.createElementVNode("map", {
@@ -3451,7 +3481,480 @@ if (uni.restoreGlobal) {
       ])
     ]);
   }
-  const PagesMapMap = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__file", "D:/app/om-engineer/pages/map/map.vue"]]);
+  const PagesMapMap = /* @__PURE__ */ _export_sfc(_sfc_main$3, [["render", _sfc_render$2], ["__file", "D:/app/om-engineer/pages/map/map.vue"]]);
+  const _sfc_main$2 = {
+    data() {
+      return {
+        token: "",
+        id: "",
+        info: {
+          name: "",
+          phone: "",
+          engineerNo: ""
+        },
+        to: {
+          no: 0,
+          yes: 0,
+          total: 0
+        },
+        loading: true,
+        // 添加加载状态
+        error: null
+        // 添加错误处理
+      };
+    },
+    onLoad() {
+      this.initData();
+    },
+    methods: {
+      async initData() {
+        try {
+          this.getAccessToken();
+          if (!this.token || !this.id) {
+            throw new Error("用户凭证缺失，请重新登录");
+          }
+          await Promise.all([
+            this.getInfo(),
+            this.getTotal()
+          ]);
+        } catch (err) {
+          this.error = err.message;
+          formatAppLog("error", "at pages/my/my.vue:86", "数据加载失败:", err);
+        } finally {
+          this.loading = false;
+        }
+      },
+      getAccessToken() {
+        this.token = uni.getStorageSync("token");
+        this.id = uni.getStorageSync("id");
+        formatAppLog("log", "at pages/my/my.vue:94", "用户ID:", this.id);
+      },
+      getInfo() {
+        return new Promise((resolve, reject) => {
+          uni.request({
+            url: `${baseConfig.baseUrl}/engineer/my/info/${this.id}`,
+            method: "GET",
+            header: {
+              "Authorization": `Bearer ${this.token}`
+            },
+            success: (res) => {
+              if (res.data.code === 200) {
+                this.info = {
+                  ...this.info,
+                  name: res.data.data.name || "未设置",
+                  phone: res.data.data.phone || "未设置",
+                  engineerNo: res.data.data.engineerNo || "未设置"
+                };
+                resolve();
+              } else {
+                reject(new Error(`获取个人信息失败: ${res.data.message}`));
+              }
+            },
+            fail: (err) => {
+              reject(err);
+            }
+          });
+        });
+      },
+      getTotal() {
+        return new Promise((resolve, reject) => {
+          uni.request({
+            url: `${baseConfig.baseUrl}/engineer/my/random/${this.id}`,
+            method: "GET",
+            header: {
+              "Authorization": `Bearer ${this.token}`
+            },
+            success: (res) => {
+              if (res.data.code === 200) {
+                this.to = {
+                  no: res.data.data.no || 0,
+                  yes: res.data.data.yes || 0,
+                  total: res.data.data.total || 0
+                };
+                resolve();
+              } else {
+                reject(new Error(`获取统计信息失败: ${res.data.message}`));
+              }
+            },
+            fail: (err) => {
+              reject(err);
+            }
+          });
+        });
+      },
+      changePassword() {
+        uni.navigateTo({
+          url: "/pages/password/password"
+        });
+      }
+    }
+  };
+  function _sfc_render$1(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
+      vue.createCommentVNode(" 个人信息 "),
+      vue.createElementVNode("view", { class: "info-section" }, [
+        vue.createElementVNode("view", { class: "info-item" }, [
+          vue.createElementVNode("text", { class: "label" }, "姓名："),
+          vue.createElementVNode(
+            "text",
+            { class: "value" },
+            vue.toDisplayString($data.info.name),
+            1
+            /* TEXT */
+          )
+        ]),
+        vue.createElementVNode("view", { class: "info-item" }, [
+          vue.createElementVNode("text", { class: "label" }, "工号："),
+          vue.createElementVNode(
+            "text",
+            { class: "value" },
+            vue.toDisplayString($data.info.engineerNo),
+            1
+            /* TEXT */
+          )
+        ]),
+        vue.createElementVNode("view", { class: "info-item" }, [
+          vue.createElementVNode("text", { class: "label" }, "电话："),
+          vue.createElementVNode(
+            "text",
+            { class: "value" },
+            vue.toDisplayString($data.info.phone),
+            1
+            /* TEXT */
+          )
+        ])
+      ]),
+      vue.createCommentVNode(" 状态卡片 "),
+      vue.createElementVNode("view", { class: "status-container" }, [
+        vue.createElementVNode("view", { class: "status-box pending" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "number" },
+            vue.toDisplayString($data.to.no),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("text", { class: "text" }, "待处理")
+        ]),
+        vue.createElementVNode("view", { class: "status-box completed" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "number" },
+            vue.toDisplayString($data.to.yes),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("text", { class: "text" }, "已完成")
+        ]),
+        vue.createElementVNode("view", { class: "status-box total" }, [
+          vue.createElementVNode(
+            "text",
+            { class: "number" },
+            vue.toDisplayString($data.to.total),
+            1
+            /* TEXT */
+          ),
+          vue.createElementVNode("text", { class: "text" }, "总工单")
+        ])
+      ]),
+      vue.createCommentVNode(" 修改密码按钮 "),
+      vue.createElementVNode("button", {
+        class: "change-password-btn",
+        onClick: _cache[0] || (_cache[0] = (...args) => $options.changePassword && $options.changePassword(...args))
+      }, "修改密码")
+    ]);
+  }
+  const PagesMyMy = /* @__PURE__ */ _export_sfc(_sfc_main$2, [["render", _sfc_render$1], ["__file", "D:/app/om-engineer/pages/my/my.vue"]]);
+  const _sfc_main$1 = {
+    data() {
+      return {
+        user: {},
+        form: {
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        },
+        engineer: {
+          id: "",
+          password: ""
+        },
+        pass: "",
+        token: "",
+        rules: {
+          oldPassword: [{
+            required: true,
+            message: "请输入旧密码"
+          }],
+          newPassword: [
+            {
+              required: true,
+              message: "请输入新密码"
+            },
+            {
+              min: 6,
+              message: "新密码长度不能少于6位"
+            }
+          ],
+          confirmPassword: [
+            {
+              required: true,
+              message: "请再次输入新密码"
+            },
+            {
+              validator: "validateConfirmPassword",
+              message: "两次输入的新密码不一致"
+            }
+          ]
+        },
+        errors: {
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        },
+        showNewPassword: false,
+        showConfirmPassword: false
+      };
+    },
+    methods: {
+      getAccessToken() {
+        this.token = uni.getStorageSync("token");
+        this.engineer.id = uni.getStorageSync("id");
+        this.pass = uni.getStorageSync("password");
+        formatAppLog("log", "at pages/password/password.vue:110", "用户ID:", this.id);
+      },
+      validateField(field) {
+        const value = this.form[field];
+        const rules = this.rules[field] || [];
+        let error = "";
+        for (const rule of rules) {
+          if (rule.required && !value.trim()) {
+            error = rule.message;
+            break;
+          }
+          if (rule.min && value.length < rule.min) {
+            error = rule.message;
+            break;
+          }
+          if (rule.validator === "validateConfirmPassword") {
+            if (value !== this.form.newPassword) {
+              error = rule.message;
+              break;
+            }
+          }
+        }
+        this.errors[field] = error;
+        return !error;
+      },
+      validateAllFields() {
+        let isValid = true;
+        ["oldPassword", "newPassword", "confirmPassword"].forEach((field) => {
+          if (!this.validateField(field)) {
+            isValid = false;
+          }
+        });
+        return isValid;
+      },
+      toggleShowPassword(type) {
+        if (type === "newPassword") {
+          this.showNewPassword = !this.showNewPassword;
+        } else {
+          this.showConfirmPassword = !this.showConfirmPassword;
+        }
+      },
+      submitForm() {
+        if (this.validateAllFields()) {
+          if (this.form.oldPassword === this.pass) {
+            this.engineer.password = this.form.newPassword;
+            uni.request({
+              url: `${baseConfig.baseUrl}/engineer/password`,
+              method: "POST",
+              // 修正为大写POST
+              header: {
+                "Authorization": `Bearer ${this.token}`
+              },
+              data: this.engineer,
+              // 添加data参数
+              success: (res) => {
+                if (res.data.code === 200) {
+                  uni.showToast({
+                    title: "修改成功",
+                    icon: "success"
+                  });
+                  this.resetForm();
+                  ({
+                    pass: this.form.newPassword
+                  });
+                  setTimeout(() => {
+                    uni.navigateBack();
+                  }, 1500);
+                } else {
+                  uni.showToast({
+                    title: res.data.message || "修改失败",
+                    icon: "none"
+                  });
+                }
+              },
+              fail: (err) => {
+                formatAppLog("error", "at pages/password/password.vue:197", "修改密码请求失败:", err);
+                uni.showToast({
+                  title: "网络错误，请稍后重试",
+                  icon: "none"
+                });
+              }
+            });
+          } else {
+            uni.showToast({
+              title: "旧密码不正确",
+              icon: "none"
+            });
+          }
+        }
+      },
+      resetForm() {
+        this.form = {
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        };
+        this.errors = {
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        };
+      }
+    },
+    onLoad() {
+      this.getAccessToken();
+    }
+  };
+  function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
+    return vue.openBlock(), vue.createElementBlock("view", { class: "container" }, [
+      vue.createElementVNode("view", { class: "card" }, [
+        vue.createElementVNode("view", { class: "title" }, "修改密码"),
+        vue.createElementVNode(
+          "form",
+          {
+            onSubmit: _cache[8] || (_cache[8] = (...args) => $options.submitForm && $options.submitForm(...args)),
+            onReset: _cache[9] || (_cache[9] = (...args) => $options.resetForm && $options.resetForm(...args))
+          },
+          [
+            vue.createElementVNode("view", { class: "form-item" }, [
+              vue.createElementVNode("view", { class: "label" }, "旧密码"),
+              vue.createElementVNode("view", { class: "input-wrapper" }, [
+                vue.withDirectives(vue.createElementVNode(
+                  "input",
+                  {
+                    "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => $data.form.oldPassword = $event),
+                    type: "password",
+                    placeholder: "请输入旧密码",
+                    onBlur: _cache[1] || (_cache[1] = ($event) => $options.validateField("oldPassword"))
+                  },
+                  null,
+                  544
+                  /* NEED_HYDRATION, NEED_PATCH */
+                ), [
+                  [vue.vModelText, $data.form.oldPassword]
+                ]),
+                $data.errors.oldPassword ? (vue.openBlock(), vue.createElementBlock(
+                  "view",
+                  {
+                    key: 0,
+                    class: "error-message"
+                  },
+                  vue.toDisplayString($data.errors.oldPassword),
+                  1
+                  /* TEXT */
+                )) : vue.createCommentVNode("v-if", true)
+              ])
+            ]),
+            vue.createElementVNode("view", { class: "form-item" }, [
+              vue.createElementVNode("view", { class: "label" }, "新密码"),
+              vue.createElementVNode("view", { class: "input-wrapper" }, [
+                vue.createElementVNode("view", { class: "password-input" }, [
+                  vue.withDirectives(vue.createElementVNode("input", {
+                    "onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => $data.form.newPassword = $event),
+                    type: $data.showNewPassword ? "text" : "password",
+                    placeholder: "请输入新密码",
+                    onBlur: _cache[3] || (_cache[3] = ($event) => $options.validateField("newPassword"))
+                  }, null, 40, ["type"]), [
+                    [vue.vModelDynamic, $data.form.newPassword]
+                  ]),
+                  vue.createElementVNode(
+                    "text",
+                    {
+                      class: "iconfont",
+                      onClick: _cache[4] || (_cache[4] = ($event) => $options.toggleShowPassword("newPassword"))
+                    },
+                    vue.toDisplayString($data.showNewPassword ? "👁️" : "👁️‍🗨️"),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                $data.errors.newPassword ? (vue.openBlock(), vue.createElementBlock(
+                  "view",
+                  {
+                    key: 0,
+                    class: "error-message"
+                  },
+                  vue.toDisplayString($data.errors.newPassword),
+                  1
+                  /* TEXT */
+                )) : vue.createCommentVNode("v-if", true)
+              ])
+            ]),
+            vue.createElementVNode("view", { class: "form-item" }, [
+              vue.createElementVNode("view", { class: "label" }, "确认新密码"),
+              vue.createElementVNode("view", { class: "input-wrapper" }, [
+                vue.createElementVNode("view", { class: "password-input" }, [
+                  vue.withDirectives(vue.createElementVNode("input", {
+                    "onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => $data.form.confirmPassword = $event),
+                    type: $data.showConfirmPassword ? "text" : "password",
+                    placeholder: "请再次输入新密码",
+                    onBlur: _cache[6] || (_cache[6] = ($event) => $options.validateField("confirmPassword"))
+                  }, null, 40, ["type"]), [
+                    [vue.vModelDynamic, $data.form.confirmPassword]
+                  ]),
+                  vue.createElementVNode(
+                    "text",
+                    {
+                      class: "iconfont",
+                      onClick: _cache[7] || (_cache[7] = ($event) => $options.toggleShowPassword("confirmPassword"))
+                    },
+                    vue.toDisplayString($data.showConfirmPassword ? "👁️" : "👁️‍🗨️"),
+                    1
+                    /* TEXT */
+                  )
+                ]),
+                $data.errors.confirmPassword ? (vue.openBlock(), vue.createElementBlock(
+                  "view",
+                  {
+                    key: 0,
+                    class: "error-message"
+                  },
+                  vue.toDisplayString($data.errors.confirmPassword),
+                  1
+                  /* TEXT */
+                )) : vue.createCommentVNode("v-if", true)
+              ])
+            ]),
+            vue.createElementVNode("view", { class: "button-group" }, [
+              vue.createElementVNode("button", {
+                type: "primary",
+                "form-type": "submit"
+              }, "提交"),
+              vue.createElementVNode("button", {
+                type: "default",
+                "form-type": "reset"
+              }, "重置")
+            ])
+          ],
+          32
+          /* NEED_HYDRATION */
+        )
+      ])
+    ]);
+  }
+  const PagesPasswordPassword = /* @__PURE__ */ _export_sfc(_sfc_main$1, [["render", _sfc_render], ["__scopeId", "data-v-f800cd94"], ["__file", "D:/app/om-engineer/pages/password/password.vue"]]);
   __definePage("pages/login/login", PagesLoginLogin);
   __definePage("pages/index/index", PagesIndexIndex);
   __definePage("pages/fail/fail", PagesFailFail);
@@ -3460,6 +3963,8 @@ if (uni.restoreGlobal) {
   __definePage("pages/rtestOrder/rtestOrder", PagesRtestOrderRtestOrder);
   __definePage("pages/baoyangOrder/baoyangOrder", PagesBaoyangOrderBaoyangOrder);
   __definePage("pages/map/map", PagesMapMap);
+  __definePage("pages/my/my", PagesMyMy);
+  __definePage("pages/password/password", PagesPasswordPassword);
   const _sfc_main = {
     onLaunch() {
       websocketObj.setMessageHandler(this.handleGlobalMessage);

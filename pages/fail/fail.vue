@@ -109,7 +109,7 @@
 				finishUrl: '',
 				deviceName: '',
 				deviceOptions: [],
-				token: '' // 请确保在实际使用中正确获取和存储 token
+				token: ''
 			};
 		},
 		onLoad(options) {
