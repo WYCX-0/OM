@@ -66,7 +66,7 @@
                 <label>巡检完成图片：</label>
                 <div class="image-container">
                   <img 
-                    :src="'http://localhost:9090' + workOrder.finishUrl" 
+                    :src="imageUrl" 
                     alt="巡检图片"
                     class="preview-image"
                   >
@@ -82,6 +82,7 @@
 <script>
 import request from "@/utils/request";
 import moment from "moment";
+import config from "@/utils/config";
 
 export default {
     data() {
@@ -108,6 +109,9 @@ export default {
         };
     },
     computed: {
+      imageUrl() {
+            return `${config.baseUrl}${this.workOrder.finishUrl}`
+        },
         getStatusText() {
             return status => this.statusFlow.find(s => s.value === status)?.text || "未知";
         },

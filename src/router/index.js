@@ -20,6 +20,7 @@ const routes = [
     redirect:'/index/home',
     children:[
       {path:'home',name:'Home',component:()=>import('../views/index/HomeView.vue')},
+      {path:'password',name:'Password',component:()=>import('../views//index/PasswordView.vue')},
       {path:'engineer',name:'Engineer',component:()=>import('../views/index/EngineerView.vue')},
       {path:'device',name:'Device',component:()=>import('../views/index/DeviceView.vue')},
       {path:'fail',name:'Fail',component:()=>import('../views/index/FailView.vue')},

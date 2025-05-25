@@ -66,7 +66,7 @@
                 <label>检测完成图片：</label>
                 <div class="image-container">
                   <img 
-                    :src="'http://localhost:9090' + workOrder.finishUrl" 
+                  :src="getImageUrl(workOrder.finishUrl)"
                     alt="检测图片"
                     class="preview-image"
                   >
@@ -82,6 +82,7 @@
 <script>
 import request from "@/utils/request";
 import moment from "moment";
+import config from "@/utils/config";
 
 export default {
     data() {
@@ -108,6 +109,14 @@ export default {
         };
     },
     computed: {
+      getImageUrl() {
+            return (path) => {
+                if (!path) return '';
+                // 确保路径以斜杠开头，避免拼接错误
+                const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+                return `${config.baseUrl}${normalizedPath}`;
+            }
+        },
         getStatusText() {
             return status => this.statusFlow.find(s => s.value === status)?.text || "未知";
         },

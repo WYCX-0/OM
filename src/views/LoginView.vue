@@ -24,6 +24,7 @@
 <script>
 import request from "@/utils/request.js";
 import WebSocketService from "@/utils/websocket.js";
+import config from "@/utils/config";
 import Vue from 'vue';
 
 export default {
@@ -51,13 +52,14 @@ export default {
           request.post('/admin/login', this.user).then(res => {
             if (res.code === 200) {
               localStorage.setItem("user0", JSON.stringify(res.data));
+              console.log(res.data);
               this.$message.success('登录成功');
 
               // 获取 token
               const token = res.data.token; // 假设 token 在 res.data.token 中
 
               // 创建 WebSocket 实例并连接，传递 $globalDialog 实例
-              const socketUrl = `ws://192.168.103.195:9090/ws/admin/${res.data.id}`; // 替换为实际的 WebSocket 地址
+              const socketUrl = `${config.wsBaseUrl}/ws/admin/${res.data.id}`; // 替换为实际的 WebSocket 地址
               const webSocketService = new WebSocketService(socketUrl, token);
               webSocketService.connect();
 

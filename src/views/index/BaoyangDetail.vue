@@ -66,7 +66,7 @@
                 <label>维修完成图片：</label>
                 <div class="image-container">
                   <img 
-                    :src="'http://localhost:9090' + workOrder.finishUrl" 
+                    :src="imageUrl" 
                     alt="维修后图片"
                     class="preview-image"
                   >
@@ -81,6 +81,7 @@
   
 <script>
 import request from "@/utils/request";
+import config from "@/utils/config";
 import moment from "moment";
 
 export default {
@@ -143,9 +144,13 @@ export default {
                         lineActive
                     };
                 });
+        },
+        imageUrl() {
+            return `${config.baseUrl}${this.workOrder.finishUrl}`
         }
     },
     methods: {
+     
         getToken() {
             const user = JSON.parse(localStorage.getItem("user0"));
             if (user?.token) {

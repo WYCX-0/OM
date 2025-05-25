@@ -67,7 +67,7 @@
                 <label>报修图片：</label>
                 <div class="image-container">
                   <img 
-                    :src="'http://localhost:9090' + workOrder.beforeUrl" 
+                    :src="imageUrl1" 
                     alt="报修前图片"
                     class="preview-image"
                   >
@@ -80,7 +80,7 @@
                 <label>维修完成图片：</label>
                 <div class="image-container">
                   <img 
-                    :src="'http://localhost:9090' + workOrder.finishUrl" 
+                    :src="imageUrl2" 
                     alt="维修后图片"
                     class="preview-image"
                   >
@@ -95,6 +95,7 @@
   
 <script>
 import request from "@/utils/request";
+import config from "@/utils/config";
 import moment from "moment";
 
 export default {
@@ -157,6 +158,12 @@ export default {
                         lineActive
                     };
                 });
+        },
+        imageUrl1() {
+            return `${config.baseUrl}${this.workOrder.beforeUrl}`
+        },
+        imageUrl2() {
+            return `${config.baseUrl}${this.workOrder.finishUrl}`
         }
     },
     methods: {

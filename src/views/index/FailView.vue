@@ -35,12 +35,6 @@
         <div class="table-container">
             <el-table :data="tableData" border v-loading="loading" style="width: 100%">
                 <el-table-column prop="id" label="ID" width="60"></el-table-column>
-                <el-table-column label="报修前图片" width="120">
-                    <template slot-scope="scope">
-                        <img :src="'http://localhost:9090' + scope.row.beforeUrl" alt="报修前图片"
-                            style="width: 100px; height: 80px; object-fit: cover;">
-                    </template>
-                </el-table-column>
                 <el-table-column prop="detail" label="报修细节" width="110"></el-table-column>
                 <el-table-column prop="deviceName" label="报修设备" width="110"></el-table-column>
                 <el-table-column prop="engineerName" label="工程师" width="110"></el-table-column>
@@ -95,9 +89,9 @@
                 <!-- 上传图片 -->
                 <el-form-item label="请上传故障图片">
                     <div>
-                        <el-upload class="avatar-uploader" action="http://localhost:9090/upload" :show-file-list="false"
+                        <el-upload class="avatar-uploader" action="`${config.baseUrl}`/upload" :show-file-list="false"
                             :on-success="handleAvatarSuccess" :on-error="handleUploadError">
-                            <img v-if="form.beforeUrl" :src="'http://localhost:9090' + form.beforeUrl" class="avatar">
+                            <img v-if="form.beforeUrl" :src="getImageUrl(form.beforeUrl)" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </div>
@@ -114,6 +108,7 @@
 <script>
 import request from "@/utils/request.js";
 import moment from 'moment';
+import config from "@/utils/config";
 
 export default {
     data() {
@@ -152,6 +147,17 @@ export default {
                 ]
             }
         };
+    },
+    computed: {
+        // 计算属性：获取图片URL
+        getImageUrl() {
+            return (path) => {
+                if (!path) return '';
+                // 确保路径以斜杠开头，避免拼接错误
+                const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+                return `${config.baseUrl}${normalizedPath}`;
+            }
+        }
     },
     created() {
         this.getToken();
