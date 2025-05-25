@@ -41,4 +41,11 @@ public interface EngineerService {
      * @return
      */
     List<EngineerGetVO> get();
+
+    /**
+     * 查询单个工程师信息
+     * @param id
+     * @return
+     */
+    Engineer info(Long id);
 }

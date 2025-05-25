@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class EngineerLoginVO {
     private long id;
     private String name;
+    private String password;
     private String token;
 }

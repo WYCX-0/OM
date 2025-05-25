@@ -35,6 +35,7 @@ public class AdminController {
     @PostMapping("/login")
     public Result<AdminVO> login(@RequestBody Admin admin) {
         log.info("管理员登录: {}", admin);
+        String password = admin.getPassword();
         admin = adminService.login(admin);
         if (admin == null) {
             return Result.error("用户名或密码错误");
@@ -42,7 +43,7 @@ public class AdminController {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.ADMIN_ID, admin.getId());
         String token = JwtUtil.creatJWT(jwtProperties.getAdminSecretKey(), jwtProperties.getAdminTtl(), claims);
-        AdminVO adminLoginVO = new AdminVO(admin.getId(), admin.getUsername(),token);
+        AdminVO adminLoginVO = new AdminVO(admin.getId(),admin.getUsername(), password,token);
         return Result.success(adminLoginVO);
     }
 
@@ -52,6 +53,18 @@ public class AdminController {
      */
     @PostMapping("/logout")
     public Result<String> logout() {
+        return Result.success();
+    }
+
+    /**
+     * 修改密码
+     * @param admin
+     * @return
+     */
+    @PostMapping("/password")
+    public Result<String> updatePassword(@RequestBody Admin admin) {
+        log.info("修改密码: {}", admin);
+        adminService.updatePassword(admin);
         return Result.success();
     }
 }

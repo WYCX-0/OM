@@ -53,4 +53,12 @@ public interface EngineerMapper {
      */
     @Select("select * from engineer")
     List<Engineer> get();
+
+    /**
+     * 根据id查询工程师
+     * @param id
+     * @return
+     */
+    @Select("select * from engineer where id = #{id}")
+    Engineer getById(Long id);
 }

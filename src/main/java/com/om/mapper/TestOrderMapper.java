@@ -64,4 +64,13 @@ public interface TestOrderMapper {
             "ORDER BY fault_count DESC")
     List<Map<String, Object>> summary();
 
+    @Select("SELECT COUNT(*) AS test1 FROM test_order WHERE status = 1 and engineer_id=#{engineerId}")
+    Integer getFail1(Long engineerId);
+
+    @Select("SELECT COUNT(*) AS test3 FROM test_order WHERE status = 3 and engineer_id=#{engineerId}")
+    Integer getFail3(Long engineerId);
+
+    @Select("SELECT COUNT(*) AS testt FROM test_order WHERE status !=0 and engineer_id=#{engineerId}")
+    Integer getFailCount(Long engineerId);
+
 }

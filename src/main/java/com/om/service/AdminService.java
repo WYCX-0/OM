@@ -10,4 +10,10 @@ public interface AdminService {
      * @return
      */
     Admin login(Admin admin);
+
+    /**
+     * 修改密码
+     * @param admin
+     */
+    void updatePassword(Admin admin);
 }

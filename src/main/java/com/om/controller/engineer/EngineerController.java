@@ -46,7 +46,7 @@ public class EngineerController {
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.ENGINEER_ID, engineer.getId());
         String token = JwtUtil.creatJWT(jwtProperties.getEngineerSecretKey(), jwtProperties.getEngineerTtl(), claims);
-        EngineerLoginVO engineerLoginVO = new EngineerLoginVO(engineer.getId(),engineer.getName(), token);
+        EngineerLoginVO engineerLoginVO = new EngineerLoginVO(engineer.getId(),engineer.getName(),engineerLoginDTO.getPassword(), token);
         return Result.success(engineerLoginVO);
     }
 
@@ -56,6 +56,18 @@ public class EngineerController {
      */
     @PostMapping("/logout")
     public Result<String> logout() {
+        return Result.success();
+    }
+
+    /**
+     * 修改密码
+     * @param engineer
+     * @return
+     */
+    @PostMapping("/password")
+    public Result<String> updatePassword(@RequestBody Engineer engineer) {
+        log.info("修改密码: {}", engineer);
+        engineerService.update(engineer);
         return Result.success();
     }
 }

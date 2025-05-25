@@ -90,4 +90,14 @@ public class EngineerServiceImpl implements EngineerService {
         List<Engineer> engineers=engineerMapper.get();
         return engineers.stream().map(engineer -> new EngineerGetVO(engineer.getId(), engineer.getName())).toList();
     }
+
+    /**
+     * 获取单个工程师信息
+     * @param id
+     * @return
+     */
+    @Override
+    public Engineer info(Long id) {
+        return engineerMapper.getById(id);
+    }
 }

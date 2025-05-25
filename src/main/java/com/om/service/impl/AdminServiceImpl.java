@@ -36,4 +36,18 @@ public class AdminServiceImpl implements AdminService {
         }
         return admin;
     }
+
+    /**
+     * 修改密码
+     * @param admin
+     */
+    @Override
+    public void updatePassword(Admin admin) {
+        String password = admin.getPassword();
+        log.info("加密前的密码：{}",password);
+        password= DigestUtils.md5DigestAsHex(password.getBytes());
+        log.info("加密后的密码：{}",password);
+        admin.setPassword(password);
+        adminMapper.updatePassword(admin);
+    }
 }

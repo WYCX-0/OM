@@ -47,7 +47,7 @@ public interface FailMapper {
      * @param engineerId
      * @return
      */
-    @Select("select * from fail where engineer_id = #{engineerId} order by status asc")
+    @Select("select * from fail where engineer_id = #{engineerId} and status!=0 order by status asc")
     List<Fail> getFail(long engineerId);
 
     /**
@@ -87,5 +87,14 @@ public interface FailMapper {
             "ON e.id = f.engineer_id " +
             "ORDER BY fault_count DESC")
     List<Map<String, Object>> summary();
+
+    @Select("SELECT COUNT(*) AS fail1 FROM fail WHERE status = 1 and engineer_id=#{engineerId}")
+    Integer getFail1(Long engineerId);
+
+    @Select("SELECT COUNT(*) AS fail3 FROM fail WHERE status = 3 and engineer_id=#{engineerId}")
+    Integer getFail3(Long engineerId);
+
+    @Select("SELECT COUNT(*) AS failt FROM fail WHERE status !=0 and engineer_id=#{engineerId}")
+    Integer getFailCount(Long engineerId);
 
 }

@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminVO {
+public class RandomVO {
 
-    private Integer id;
-    private String username;
-    private String password;
-    private String token;
+    private Long id;
+    private Integer no;
+    private Integer yes;
+    private Integer total;
 }
